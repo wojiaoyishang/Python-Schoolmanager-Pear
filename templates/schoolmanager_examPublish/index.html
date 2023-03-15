@@ -27,7 +27,9 @@
                             <option value="">查询所有届数</option>
                             {# 表格 学生届数 输出 #}
                             {% for grade in grades %}
+                                {% if grade != "" %}
                                 <option value="{{ grade }}">{{ grade }}届学生数据</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
                     </div>
