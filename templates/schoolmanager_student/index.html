@@ -26,7 +26,9 @@
                         <select name="grade" lay-verify="">
                             {# 表格 学生届数 输出 #}
                             {% for grade in grades %}
+                                {% if grade != "" %}
                                 <option value="{{ grade }}">{{ grade }}届学生数据</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
                     </div>
@@ -37,7 +39,9 @@
                             <option value="0">全部班级</option>
                             {# 表格 班级 输出 #}
                             {% for class in classes %}
+                                {% if class != "" %}
                                 <option value="{{ class }}">{{ class }} 班</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
                     </div>
