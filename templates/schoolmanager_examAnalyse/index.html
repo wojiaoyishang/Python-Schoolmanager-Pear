@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>考试分析</title>
+    <style>
+        .layui-form-select dl dd.layui-this {
+            background-color: #F6F6F6;
+            color: #000 !important;
+            font-weight: 700;
+        }
+    </style>
+    {% include 'admin/common/header.html' %}
+</head>
+
+<body class="pear-container">
+
+    <div class="layui-col-md12">
+        <div class="layui-card">
+            <div class="layui-card-header">分析选项</div>
+            <div class="layui-card-body">   
+                <form class="layui-form" action="" lay-filter="query-form">
+                    <div class="layui-form-item">
+
+                        <div class="layui-col-md12">
+                            <label class="layui-form-label">选择年段</label>
+                            <div class="layui-input-inline">
+                                <select name="grade">
+                                    {% for grade in grades %}
+                                    <option value="{{ grade }}">{{ grade }}届学生数据</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <input type="checkbox" name="giveMark" title="赋分成绩" lay-skin="primary" checked="">
+                        </div>
+
+
+                    </div>
+
+                    <div class="layui-form-item" style="text-align: right">
+
+                        <button class="pear-btn pear-btn-primary query" lay-submit lay-filter="query">
+                            <i class="layui-icon layui-icon-search"></i>
+                            分析
+                        </button>
+                        <button id="reset" type="reset" class="pear-btn pear-btn-warming" style="background-color: #000 !important;">
+                            <i class="layui-icon layui-icon-refresh"></i>
+                            重置
+                        </btton>
+                    </div>
+
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-row layui-col-space10">
+
+    <div class="layui-col-md6">
+
+        <div class="layui-card">
+            <div class="layui-card-header">历次特控线人数比对</div>
+            <div class="layui-card-body">
+                <div id="历次特控线人数比对" style="min-height:400px;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="layui-col-md6">
+        <div class="layui-card">
+            <div class="layui-card-header">各班历次特控线人数比对</div>
+            <div class="layui-card-body">
+                <div id="各班历次特控线人数比对" style="min-height:400px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-col-md2">
+        <div class="layui-card">
+            <div class="layui-card-header">选择考试以统计分数段</div>
+            <div class="layui-card-body">
+                <div id="所有考试选择"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-col-md10">
+        <div class="layui-card">
+            <div class="layui-card-header" id="分数段统计">分数段统计 点击左侧树型框查看统计</div>
+            <div class="layui-card-body load-div">
+                <form class="layui-form" action="" lay-filter="分数段统计">
+                    <div class="layui-form-item">
+
+                        <div class="layui-col-md11">
+                            <label class="layui-form-label">分数段</label>
+                            <div class="layui-input-block">
+                                <input type="text" class="layui-input" id="time" name="ranks" value="100,200,300,400,500,600,700">
+                            </div>
+                            
+                        </div>
+                        <div class="layui-col-md1">
+                            &nbsp;&nbsp;<input type="checkbox" name="giveMark" title="赋分成绩" lay-skin="primary" checked="">
+                        </div>
+
+                    </div>
+          
+                </form>
+
+                <div id="分数段表格">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    
+    </div>
+
+</body>
+
+
+{% include 'admin/common/footer.html' %}
+<script src="{{ url_for('schoolmanager.static', filename='js/examAnalyse/index.js') }}"></script>
+<script>
+
+ranks_table = `
+<table class="layui-table">
+    <thead>
+        <tr>
+            <th>班级</th>
+            <%# layui.each(d.ranks, function(index, item) { %>
+            <th>前<% item %>名</th>
+            <%# }); %>
+        </tr> 
+        </thead>
+        <tbody>
+            <%# for (let p in d.data) { %>
+            <tr>
+                <td><% p %>班</td>
+                <%# layui.each(d.ranks, function(index, item) { %>
+                    <td><% d.data[p][item] %></td>
+                <%# }); %>
+            </tr>
+            <%# } %>
+    </tbody>
+</table>
+`
+
+function 全部重新统计(grade=null, giveMark=null) {
+    if (grade == null) {
+        grade = layui.form.val("query-form").grade
+    }
+    if (giveMark == null) {
+        giveMark = layui.form.val("query-form").giveMark == "on" ? 1 : 0
+    }
+
+    特控线人数统计(grade, giveMark)
+    各班特控线人数统计(grade, giveMark)
+}
+
+function 特控线人数统计(grade, giveMark) {
+    layui.$.ajax({
+        url: '/schoolmanager/examAnalyse/specMarkStudent',
+        data: {grade: grade, giveMark: giveMark},
+        type: 'get',
+        success: function (result) {
+            bar_chart("历次特控线人数比对", "人数：人", "特控线人数", "特控线人数", result.examName, result.examCount)   
+        }
+    })
+}
+
+function 各班特控线人数统计(grade, giveMark) {
+    layui.$.ajax({
+        url: '/schoolmanager/examAnalyse/specMarkStudent_by_class',
+        data: {grade: grade, giveMark: giveMark},
+        type: 'get',
+        success: function (result) {
+            let xData = result.examName;
+            // 提取所有键作为图例数据并按从小到大排序，然后在每个值后面加上 "班" 字
+            let legendData = [...new Set(result.examCount.flatMap(item => Object.keys(item)))].sort((a, b) => a - b).map(key => key + '班');
+            // 根据键分组数据
+            let seriesData = legendData.map(key => {
+                // 获取原始的键值
+                let originalKey = key.replace('班', '');
+                return {
+                    name: key,
+                    type: 'line',
+                    smooth: true,
+                    // 使用原始的键值来获取数据
+                    data: result.examCount.map(item => item[originalKey] || 0)
+                }
+            }); 
+
+            line_chart_1("各班历次特控线人数比对" , xData, legendData, seriesData)
+        }
+    })
+}
+
+
+layui.use(['jquery', 'form', 'tree', 'loading'], function () {
+    let $ = layui.jquery,
+    form = layui.form,
+    tree = layui.tree,
+    laytpl = layui.laytpl,
+    loading = layui.loading;
+
+    laytpl.config({
+        open: '<%',
+        close: '%>'
+      });
+
+    form.on('submit(query)', function(data){
+       
+        全部重新统计(data.field.grade, data.field.giveMark == 'on' ? 1 : 0)
+        return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+
+    });
+
+    全部重新统计()
+    
+    // 考试选择
+    $.ajax({
+        url: '/schoolmanager/examAnalyse/getAllExam',
+        type: 'get',
+        success: function (result) {
+            tree.render({
+                elem: '#所有考试选择',
+                data: result.data,
+                click: function(obj){
+                    if (obj.data.id != undefined) {
+
+                        loading.block({
+                            type: 2,
+                            elem: '.load-div',
+                            msg: '加载中.....'
+                        })
+
+                        document.querySelector("#分数段统计").textContent = "分数段统计 考试名称：" + obj.data.title + " (id:" + obj.data.id + ")"
+
+                        let result = {};
+                        let promises = [];
+                        for (let rank of form.val("分数段统计").ranks.split(",")) {
+                            let promise = $.ajax({
+                                url: '/schoolmanager/examAnalyse/countStudent',
+                                data: {
+                                    index: obj.data.id,
+                                    giveMark: form.val("分数段统计").giveMark == 'on' ? 1 : 0,
+                                    rank: rank
+                                },
+                                type: 'get'
+                            }).then(function (data) {
+                                for (let key in data) {
+                                    if (!result[key]) {
+                                        result[key] = {};
+                                    }
+                                    result[key][rank] = data[key];
+                                }
+                            });
+                            promises.push(promise);
+                        }
+                        
+                        Promise.all(promises).then(function () {
+                            console.log(result)
+                            laytpl(ranks_table).render({ranks: form.val("分数段统计").ranks.split(","), data: result}, function(string){
+                                document.querySelector("#分数段表格").innerHTML = string
+                                loading.blockRemove(".load-div", 1000);
+                            });
+                        });
+
+                    }
+                }
+            });
+        }
+    })
+
+    
+    
+})
+</script>
+
+</html>

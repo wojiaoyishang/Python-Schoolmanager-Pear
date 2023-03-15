@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>考试发布</title>
+    <style>
+        .layui-form-select dl dd.layui-this {
+            background-color: #F6F6F6;
+            color: #000 !important;
+            font-weight: 700;
+        }
+    </style>
+    {% include 'admin/common/header.html' %}
+</head>
+
+<body class="pear-container">
+<div>
+
+
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md12">
+
+            <div class="layui-card">
+                <div class="layui-card-header">考试基本数据</div>
+                <div class="layui-card-body" style="text-align: center;padding: 10px;">
+                    
+                    <form class="layui-form" action="" lay-filter="exam-info-form">
+                        <input name="index" value="{{ info['index'] }}" hidden>
+                        <div class="layui-form-item">
+                            <h2>基本设置</h2>
+                        </div>
+                        <div class="layui-form-item">
+
+                            <div class="layui-col-md4">
+                                <label class="layui-form-label">考试信息</label>
+                                <div class="layui-input-block">
+                                    <input value="{{ info['考试名称'] }}" type="text" name="考试名称" required lay-verify="required" placeholder="请输入考试名称" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+
+                            <div class="layui-col-md4">
+                                <select name="届数" lay-verify="">
+                                    <option value="">考试届数</option>
+                                    {# 表格 学生届数 输出 #}
+                                    {% for grade in grades %}
+                                        <option value="{{ grade }}"  {% if grade == info['届数'] %} selected {% endif %} >{{ grade }}届学生数据</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="layui-col-md4">
+                                <input type="text" class="layui-input" id="time" name="考试时间" value="{{ info['考试时间'] }}">
+                            </div>
+                        
+
+                        </div>
+
+                        <div class="layui-form-item">
+                            <h2>分数设置</h2>
+                        </div>
+
+                        <div class="layui-form-item">
+
+                            <div class="layui-col-md2">
+                                <label class="layui-form-label">特控线</label>
+                                <div class="layui-input-block">
+                                    <input value="{{ info['特控线分数'] }}" type="text" name="特控线分数" required lay-verify="required" placeholder="请输入特控线分数" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            
+                            {% set subjects = ['语文', '数学', '外语', '政治', '历史', '地理', '物理', '化学', '生物', '技术'] %}
+
+                            {% for subject in subjects %}
+                                
+                                <div class="layui-col-md2">
+                                    <label class="layui-form-label">{{ subject }}</label>
+                                    <div class="layui-input-block">
+                                        <input value="{{ info[ subject + '总分'] }}" type="text" name="{{ subject }}总分" required lay-verify="required" placeholder="请输入{{ subject }}总分" autocomplete="off" class="layui-input">
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+                        </div>
+
+                        <div class="layui-form-item">
+                            <h2>考试备注</h2>
+                        </div>
+
+                        <div class="layui-form-item">
+                             <textarea name="考试备注" placeholder="请输入备注" class="layui-textarea" value="{{ info['考试备注'] }}"></textarea>
+                        </div>
+                        
+                        <div class="layui-form-item">
+                            <h2>考试统计</h2>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <p id="考试统计"></p>
+                        </div>
+
+                        <div class="layui-form-item" style="text-align: right">
+                            <button id="submit_update" class="pear-btn pear-btn-md pear-btn-primary exam-info-update" lay-submit lay-filter="exam-info-update">
+                                更新考试数据
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+            
+            <div class="layui-card">
+                <div class="layui-card-header">查看选项</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" action="" lay-filter="exam-query-form">
+                        <div class="layui-form-item">
+
+                    
+                            <label class="layui-form-label">学生名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="name" placeholder="学生名称，支持正则表达式" class="layui-input">
+                            </div>
+
+
+                            <label class="layui-form-label">班级</label>
+                            <div class="layui-input-inline">
+                                <select name="class" lay-verify="">
+                                    <option value="">全部班级</option>
+                                    {# 表格 班级 输出 #}
+                                    {% for class in classes %}
+                                        <option value="{{ class }}">{{ class }} 班</option>
+                                    {% endfor %}
+                                </select>
+                                
+                            </div>
+                        
+                            
+                            
+                            <button class="pear-btn pear-btn-primary" lay-submit lay-filter="exam-query">
+                                <i class="layui-icon layui-icon-search"></i>
+                                统计并查询
+                            </button>
+                            <button id="reset" type="reset" class="pear-btn pear-btn-warming" style="background-color: #000 !important;">
+                                <i class="layui-icon layui-icon-refresh"></i>
+                                重置
+                            </btton>
+                            
+                        </div>
+                        <div class="layui-form-item layui-col-space10">
+                            
+                            <select name="查询设置" xm-select="select4">
+                                <option value="查看赋分成绩" selected="selected">查看赋分成绩</option>
+                                <option value="降序" selected="selected">降序</option>
+                            </select>
+                            
+                        </div>
+                    </form>
+                    Tips: 在查询的时候，程序会重新计算各科排名。
+
+                </div>
+            </div>
+
+            <div class="layui-card">
+                <div class="layui-card-header">成绩列表</div>
+                <div class="layui-card-body">
+                    <table id="data-table" lay-filter="data-table"></table>
+                </div>
+            </div>
+
+            
+            <div class="layui-card">
+                <div class="layui-card-header">学生信息</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" action="" lay-filter="student-info-form">
+
+                        <div class="layui-form-item">
+                            <div class="layui-col-md12">
+
+                                <label class="layui-form-label">姓名</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="姓名" required lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+                                </div>
+
+                                <label class="layui-form-label">总分</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="总分"  autocomplete="off" class="layui-input" disabled>
+                                </div>
+                               
+                                <label class="layui-form-label">总分排名</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="总分排名"  autocomplete="off" class="layui-input" disabled>
+                                </div>
+
+                                <label class="layui-form-label">主科</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="主科"  autocomplete="off" class="layui-input" disabled>
+                                </div>
+                                
+                                <label class="layui-form-label">主科排名</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="主科排名"  autocomplete="off" class="layui-input" disabled>
+                                </div>
+
+                                <label class="layui-form-label">副科</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="副科"  autocomplete="off" class="layui-input" disabled>
+                                </div>
+
+                                <label class="layui-form-label">副科排名</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="副科排名" autocomplete="off" class="layui-input" disabled>
+                                </div>
+                                
+                                <label class="layui-form-label">是否赋分</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="赋分" autocomplete="off" class="layui-input" value="将根据查询条件设置" disabled>
+                                </div>
+
+
+                                {% set subjects = ['语文', '数学', '外语', '政治', '历史', '地理', '物理', '化学', '生物', '技术'] %}
+
+                                {% for subject in subjects %}
+                                    
+                                    <label class="layui-form-label">{{ subject }}</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="{{ subject }}" autocomplete="off" class="layui-input">
+                                    </div>
+
+                                    <label class="layui-form-label">{{ subject }}排名</label>
+                                    <div class="layui-input-inline">
+                                        <input type="text" name="{{ subject }}排名" autocomplete="off" class="layui-input">
+                                    </div>
+
+                                {% endfor %}
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">备注</label>
+                                    <div class="layui-input-block">
+                                        <textarea name="备注" placeholder="请输入备注" class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                                                           
+                        <div class="layui-form-item" style="text-align: right">
+                            <button id="submit_delete" class="pear-btn pear-btn-md pear-btn-danger student-info-delete" lay-submit lay-filter="student-info-delete">
+                                删除学生考试数据       
+                            </button>
+                            <button id="submit_update" class="pear-btn pear-btn-md pear-btn-primary student-info-update" lay-submit lay-filter="student-info-update">
+                                更新/添加学生考试数据       
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</body>
+{% include 'admin/common/footer.html' %}
+<script src="{{ url_for('schoolmanager.static', filename='js/examPublish/info.js') }}"></script>
+
+
+</html>

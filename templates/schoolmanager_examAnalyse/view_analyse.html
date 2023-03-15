@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>成绩分析报告</title>
+    {% include 'admin/common/header.html' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin/css/other/console1.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/admin/css/other/user.css') }}" />
+    <script src="{{ url_for('static', filename='admin/component/layui/layui.js') }}"></script>
+    <script src="{{ url_for('static', filename='admin/component/pear/pear.js') }}"></script>
+    <style>
+        .list .list-item {
+            color: black !important;
+        }
+    </style>
+</head>
+
+<body class="pear-container">
+    <div>
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs6 layui-col-md3">
+                <div class="layui-card top-panel">
+                    <div class="layui-card-header">历次最高排名</div>
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space5">
+                            <div class="layui-col-xs8 layui-col-md8 top-panel-number" style="color: #28333E;"
+                                id="value1">
+                                0
+                            </div>
+                            <div class="layui-col-xs4 layui-col-md4 top-panel-tips">
+                                <svg t="1672145322402" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="2783" width="200" height="200">
+                                    <path
+                                        d="M956.352332 528.622644c-3.036666-242.871216-200.752993-438.849079-444.352332-438.84908s-441.315665 195.977864-444.352332 438.84908h888.704664z"
+                                        fill="#F9858B" p-id="2784"></path>
+                                    <path
+                                        d="M914.160732 799.653577V408.369529c0-19.715754-16.204961-35.751384-36.118267-35.751383H660.16448V253.939808a35.790894 35.790894 0 0 0-35.757028-35.751383h-221.992724a35.796538 35.796538 0 0 0-35.757028 35.751383v254.927572H148.971624c-20.020549 0-36.310175 16.041274-36.310175 35.757027v254.927572h-0.93132a35.796538 35.796538 0 0 0-35.757028 35.757028v63.160401a35.796538 35.796538 0 0 0 35.757028 35.751384h800.539742a35.796538 35.796538 0 0 0 35.757028-35.751384v-63.160401c0-19.077941-15.030934-34.662022-33.866167-35.65543z"
+                                        fill="#61585C" p-id="2785"></path>
+                                    <path d="M660.16448 412.123029h214.485724v387.42895h-214.485724z" fill="#FAD769"
+                                        p-id="2786"></path>
+                                    <path d="M406.168228 257.698953h214.485724V799.551979h-214.485724V544.624407z"
+                                        fill="#F9626B" p-id="2787"></path>
+                                    <path d="M152.171977 548.377908h214.485723v251.174071h-214.485723z" fill="#ACFB6F"
+                                        p-id="2788"></path>
+                                    <path d="M908.516371 894.715908H115.483629v-55.653401h793.032742z" fill="#C3BDC3"
+                                        p-id="2789"></path>
+                                    <path
+                                        d="M470.73972 340.535597h28.88784v106.24381h30.095734V311.754999h-41.254636zM774.0056 567.92433l9.984875-10.515445c11.762849-12.236975 19.997972-23.034638 24.47395-32.11077 4.543711-9.194664 6.84661-17.960357 6.84661-26.048727 0-6.925631-1.947305-13.800463-5.78547-20.44952-3.849454-6.671635-9.0592-11.853158-15.50506-15.403462-6.400706-3.527726-13.856907-5.311344-22.165406-5.311344-13.43358 0-24.615059 4.312292-33.245288 12.818344-8.607651 8.47783-13.315048 20.18988-13.992371 34.81442l-0.135464 2.946357h29.689339l0.101599-2.720583c0.208841-6.028178 1.862639-10.814596 4.910594-14.22379 2.985867-3.330173 6.615191-4.950105 11.09117-4.950104 4.492911 0 8.031926 1.326425 10.82024 4.075228 2.771381 2.720582 4.120384 6.101554 4.120384 10.346114 0 4.312292-1.5014 9.290618-4.453401 14.80516-3.053599 5.678227-9.386573 13.405358-18.840878 22.966905l-40.82002 41.632808v15.764701h95.271172v-28.430647h-42.366575zM285.390189 654.37901a34.097586 34.097586 0 0 0 9.44866-9.414794c3.431772-5.192812 5.170235-11.012149 5.170235-17.294323 0-10.03003-3.922831-18.801367-11.66125-26.06566-7.68762-7.213494-17.3169-10.876684-28.622556-10.876684-12.637725 0-23.294278 4.363091-31.659221 12.99332-6.039466 6.22573-9.7591 14.511653-11.068593 24.64328l-0.406394 3.18342h28.944284l0.615236-1.986815c0.88052-2.844758 2.477875-5.091214 4.882372-6.891765a12.790122 12.790122 0 0 1 7.896461-2.647205c3.273729 0 5.808048 0.88052 7.744064 2.703649 1.885217 1.783618 2.805247 3.97363 2.805247 6.705501 0 2.139213-0.632168 4.120384-1.94166 6.073332-1.343358 1.998104-3.189064 3.539014-5.644361 4.696109-2.573829 1.224826-6.699857 2.071481-12.242619 2.506096l-2.602051 0.203197v26.500276l2.788315 0.033866c8.929379 0.118532 15.781634 2.009393 20.353566 5.633072 4.425179 3.516437 6.581325 7.659398 6.581325 12.654658 0 4.588866-1.574777 8.353655-4.820284 11.53143-3.262441 3.18342-7.292515 4.741263-12.321641 4.741263-4.825929 0-8.686672-1.360291-11.785426-4.15425-3.098754-2.799603-5.147657-7.253004-6.09591-13.264248l-0.378172-2.381921H211.6071l0.174975 2.985867c0.801499 13.749664 5.469386 24.812612 13.885128 32.878404 8.415742 8.077081 19.405314 12.174887 32.646985 12.174887 13.935928 0 25.591533-4.334869 34.650733-12.863499 9.109999-8.579429 13.732731-19.190828 13.732731-31.563268 0-8.500408-2.427075-16.018697-7.213494-22.329092a36.417418 36.417418 0 0 0-14.093969-11.108103z"
+                                        fill="#F9FBFB" p-id="2790"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs6 layui-col-md3">
+                <div class="layui-card top-panel">
+                    <div class="layui-card-header">历次平均排名</div>
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space5">
+                            <div class="layui-col-xs8 layui-col-md8 top-panel-number" style="color: #28333E;"
+                                id="value2">
+                                0
+                            </div>
+                            <div class="layui-col-xs4 layui-col-md4 top-panel-tips">
+                                <svg t="1672145486054" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="3314" width="200" height="200">
+                                    <path
+                                        d="M0 0m512 0l0 0q512 0 512 512l0 0q0 512-512 512l0 0q-512 0-512-512l0 0q0-512 512-512Z"
+                                        fill="#9AB3FF" p-id="3315"></path>
+                                    <path
+                                        d="M512 40.156863a471.983686 471.983686 0 0 0-183.657412 906.62149 471.983686 471.983686 0 0 0 367.314824-869.556706 468.851451 468.851451 0 0 0-183.657412-37.064784m0-40.156863a512 512 0 1 1-512 512 512 512 0 0 1 512-512z"
+                                        fill="#262B3A" p-id="3316"></path>
+                                    <path
+                                        d="M332.900392 465.859765v511.658666c-51.84251 4.899137-151.632314-62.484078-160.948706-100.392156v-411.26651a80.313725 80.313725 0 0 1 80.313726-80.313726h0.321255a80.313725 80.313725 0 0 1 80.313725 80.313726z"
+                                        fill="#9AB3FF" p-id="3317"></path>
+                                    <path
+                                        d="M292.743529 465.859765a40.156863 40.156863 0 0 0-40.156862-40.156863h-0.321255a40.156863 40.156863 0 0 0-40.156863 40.156863v403.415843a169.923765 169.923765 0 0 0 49.392941 42.325333 238.672314 238.672314 0 0 0 31.242039 16.64502v-462.386196m40.156863 0v511.658666c-51.84251 4.899137-151.632314-62.484078-160.948706-100.392156v-411.26651a80.313725 80.313725 0 0 1 80.313726-80.313726h0.321255a80.313725 80.313725 0 0 1 80.313725 80.313726z"
+                                        fill="#262B3A" p-id="3318"></path>
+                                    <path
+                                        d="M691.119686 646.565647v330.952784c51.84251 4.899137 151.632314-62.484078 160.948706-100.392156v-230.560628a80.313725 80.313725 0 0 0-80.313725-80.313725h-0.321255a80.313725 80.313725 0 0 0-80.313726 80.313725z"
+                                        fill="#FFFFFF" p-id="3319"></path>
+                                    <path
+                                        d="M731.276549 928.245961a238.692392 238.692392 0 0 0 31.242039-16.64502 169.923765 169.923765 0 0 0 49.392941-42.325333v-222.709961a40.156863 40.156863 0 0 0-40.156862-40.156863h-0.321255a40.156863 40.156863 0 0 0-40.156863 40.156863v281.680314m-40.156863 49.292549v-330.972863a80.313725 80.313725 0 0 1 80.313726-80.313725h0.321255a80.313725 80.313725 0 0 1 80.313725 80.313725v230.560628c-9.316392 37.928157-109.126275 105.311373-160.948706 100.392156z"
+                                        fill="#262B3A" p-id="3320"></path>
+                                    <path
+                                        d="M582.27451 230.901961v762.980392c0 38.811608-140.54902 38.811608-140.54902 0v-762.980392a70.27451 70.27451 0 0 1 140.54902 0z"
+                                        fill="#396AFC" p-id="3321"></path>
+                                    <path
+                                        d="M542.117647 230.901961a30.117647 30.117647 0 0 0-60.235294 0v748.483764a120.169412 120.169412 0 0 0 30.117647 3.453491 120.169412 120.169412 0 0 0 30.117647-3.453491v-748.483764m40.156863 0v762.980392c0 38.811608-140.54902 38.811608-140.54902 0v-762.980392a70.27451 70.27451 0 0 1 140.54902 0z"
+                                        fill="#262B3A" p-id="3322"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs6 layui-col-md3">
+                <div class="layui-card top-panel">
+                    <div class="layui-card-header">劣势主学科</div>
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space5">
+                            <div class="layui-col-xs8 layui-col-md8 top-panel-number" style="color: #28333E;"
+                                id="value3">
+                                -
+                            </div>
+                            <div class="layui-col-xs4 layui-col-md4  top-panel-tips">
+                                <svg t="1672145566205" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="5711" width="200" height="200">
+                                    <path
+                                        d="M846.254529 555.164888l-78.375036-141.510482a32.656265 32.656265 0 0 0-25.79845-15.130736H238.63029a29.608347 29.608347 0 0 0-24.601053 15.783861L108.440647 642.248261"
+                                        fill="#B9E3ED" p-id="5712"></path>
+                                    <path
+                                        d="M108.440647 668.155565a24.165636 24.165636 0 0 1-10.885422-2.503647A26.016158 26.016158 0 0 1 84.819282 631.36284l105.58859-227.505314a47.025022 47.025022 0 0 1 42.453145-30.588035h512.15909a53.556275 53.556275 0 0 1 45.609917 28.302097l78.375036 141.510482a26.016158 26.016158 0 0 1-45.501062 25.254178l-78.375037-141.510482a13.824486 13.824486 0 0 0-3.592189-1.741667h-502.906482s-0.979688 0.870834-1.415105 1.415105L132.062012 653.133683a26.125012 26.125012 0 0 1-23.621365 15.021882z"
+                                        fill="#324654" p-id="5713"></path>
+                                    <path
+                                        d="M915.703519 850.377524L819.802954 674.904526a32.656265 32.656265 0 0 0-25.580741-15.23959h-511.614819a45.283354 45.283354 0 0 0-29.17293 12.735943L143.165142 789.636871"
+                                        fill="#F6E89A" p-id="5714"></path>
+                                    <path
+                                        d="M915.703519 876.393682a26.016158 26.016158 0 0 1-22.859385-13.497923l-95.900565-175.690706a10.885422 10.885422 0 0 0-3.374481-1.741668h-511.614819a22.750531 22.750531 0 0 0-10.232297 4.463023L162.21463 807.380108a26.016158 26.016158 0 0 1-38.098976-35.486474l109.725051-117.562555a71.190658 71.190658 0 0 1 48.222418-20.900009h512.15909a58.237006 58.237006 0 0 1 48.440127 28.737513L938.562905 838.185852a26.016158 26.016158 0 0 1-10.885422 35.268766 25.363033 25.363033 0 0 1-11.973964 2.939064z"
+                                        fill="#8D4520" p-id="5715"></path>
+                                    <path
+                                        d="M189.537038 781.146242h627.109144a106.132861 106.132861 0 0 1 107.765675 104.173486 106.024007 106.024007 0 0 1-107.765675 104.173485H189.537038"
+                                        fill="#F6E89A" p-id="5716"></path>
+                                    <path
+                                        d="M811.747742 1024H151.873479A26.016158 26.016158 0 0 1 125.966176 997.983842a28.519805 28.519805 0 0 1 28.955221-25.798449h659.656555a80.443266 80.443266 0 0 0 83.817747-78.375036c0-43.541687-38.860955-78.157328-87.083374-78.157328H151.873479a26.016158 26.016158 0 0 1 0-52.032316H811.747742c76.197952 0 138.897981 58.34586 138.897981 130.62506S887.945694 1024 811.747742 1024z"
+                                        fill="#8D4520" p-id="5717"></path>
+                                    <path
+                                        d="M811.747742 876.393682H195.306312a17.416675 17.416675 0 0 1-17.416675-17.307821 19.811467 19.811467 0 0 1 20.246885-17.090112h616.332576c9.579171 0 14.368757 7.510941 14.368756 17.090112A17.30782 17.30782 0 0 1 811.747742 876.393682zM811.747742 945.842672H195.306312a17.416675 17.416675 0 0 1-17.416675-17.30782 19.920322 19.920322 0 0 1 20.246885-17.198966h616.332576c9.579171 0 14.368757 7.619795 14.368756 17.198966A17.30782 17.30782 0 0 1 811.747742 945.842672z"
+                                        fill="#8D4520" p-id="5718"></path>
+                                    <path
+                                        d="M814.469098 763.838422H212.396424a104.064631 104.064631 0 0 1-103.955777-104.173486 104.173486 104.173486 0 0 1 103.955777-104.500048h602.072674"
+                                        fill="#B9E3ED" p-id="5719"></path>
+                                    <path
+                                        d="M846.254529 789.636871H216.206322a130.62506 130.62506 0 1 1-0.653126-260.161578h633.640397A23.512511 23.512511 0 0 1 872.270687 555.164888a26.016158 26.016158 0 0 1-26.016158 26.016158H216.206322a78.375036 78.375036 0 1 0-0.653126 156.532364h633.640397a23.512511 23.512511 0 0 1 23.077094 25.798449 26.016158 26.016158 0 0 1-26.016158 26.125012z"
+                                        fill="#324654" p-id="5720"></path>
+                                    <path
+                                        d="M488.994989 436.949208s-9.470317 14.151048-41.146894 14.151049c-47.569293 0-113.970365-93.723481-113.970365-230.226669a77.830765 77.830765 0 0 1 82.293788-73.803159c63.570863 0 82.184934 25.580741 87.083373 35.704183 4.89844-10.123442 23.512511-35.704183 87.083374-35.704183a77.830765 77.830765 0 0 1 82.293788 73.803159c0 136.503188-66.509927 230.226669-113.970365 230.226669-31.676577 0-41.908874-13.497923-41.908874-13.497923a26.560429 26.560429 0 0 0-14.042194-4.027606 28.084388 28.084388 0 0 0-13.715631 3.37448z"
+                                        fill="#B2EDA6" p-id="5721"></path>
+                                    <path
+                                        d="M558.661688 477.116414a85.668269 85.668269 0 0 1-56.059922-16.981257 82.293788 82.293788 0 0 1-54.427108 16.981257c-66.07451 0-140.095377-109.507342-140.095377-256.242826a4.13646 4.13646 0 0 1 0-1.088542c1.415105-34.180224 25.907304-98.839629 108.854216-98.839629 43.541687 0 70.319824 10.885422 87.083374 23.294802 16.763549-12.300527 43.541687-23.294802 87.083373-23.294802 82.293788 0 106.894841 64.659405 108.854217 98.839629v1.088542c-1.306251 146.735484-75.218264 256.242827-141.292773 256.242826z m-22.641677-56.930755a39.187518 39.187518 0 0 0 22.641677 4.89844c26.778137 0 87.736499-76.851077 87.954207-203.448532-0.870834-11.756255-7.402087-48.548981-56.27763-48.54898-52.032316 0-62.591175 18.83178-63.679717 21.008863a25.798449 25.798449 0 0 1-23.403657 14.69532 25.798449 25.798449 0 0 1-23.403656-14.69532c-1.088542-2.177084-11.756255-21.008864-63.679717-21.008863-48.657835 0-55.406796 36.466163-56.27763 48.657835 0 126.4886 61.17607 203.339677 87.954207 203.339677a35.813037 35.813037 0 0 0 20.90001-4.571877 25.907304 25.907304 0 0 1 6.640107-5.769274 53.120858 53.120858 0 0 1 27.322408-7.184378 51.705753 51.705753 0 0 1 29.064076 8.817191 23.621365 23.621365 0 0 1 4.245315 3.809898z"
+                                        fill="#3C663E" p-id="5722"></path>
+                                    <path
+                                        d="M504.234579 195.945972a26.995846 26.995846 0 0 1-9.579171-1.741667 26.125012 26.125012 0 0 1-14.695319-33.744808c6.857816-17.634383 44.303666-105.697445 101.778693-105.697444a26.016158 26.016158 0 1 1 0 52.032316c-12.735943 0-38.643247 35.37762-53.229712 72.714616A26.233866 26.233866 0 0 1 504.234579 195.945972z"
+                                        fill="#3C663E" p-id="5723"></path>
+                                    <path
+                                        d="M506.955935 173.413149h-0.76198c-2.612501 0-64.115134-1.850522-104.500048-42.34429s-42.235436-101.887547-42.235436-104.500048A26.016158 26.016158 0 0 1 386.127754 0.008382c2.612501 0 64.00628 1.850522 104.500048 42.235436 35.159912 35.159912 41.03804 86.21254 42.017728 100.690151a19.702613 19.702613 0 0 1 0 4.354168 26.016158 26.016158 0 0 1-25.689595 26.125012zM417.804331 58.354242a91.764105 91.764105 0 0 0 20.791156 35.921892A90.457854 90.457854 0 0 0 474.29967 115.067289a88.389624 88.389624 0 0 0-20.791156-35.921892 88.389624 88.389624 0 0 0-35.704183-20.791155z"
+                                        fill="#3C663E" p-id="5724"></path>
+                                    <path
+                                        d="M811.747742 642.248261H195.306312a17.416675 17.416675 0 0 1-17.416675-17.30782 19.811467 19.811467 0 0 1 20.246885-17.090112h616.332576c9.579171 0 14.368757 7.510941 14.368756 17.090112A17.30782 17.30782 0 0 1 811.747742 642.248261zM811.747742 711.479543H195.306312a17.416675 17.416675 0 0 1-17.416675-17.30782 19.811467 19.811467 0 0 1 20.246885-17.090112h616.332576c9.579171 0 14.368757 7.510941 14.368756 17.090112A17.30782 17.30782 0 0 1 811.747742 711.479543z"
+                                        fill="#324654" p-id="5725"></path>
+                                    <path d="M525.134589 173.413149s216.946454-52.14117 34.724495 260.379287"
+                                        fill="#B2EDA6" p-id="5726"></path>
+                                    <path
+                                        d="M559.75023 459.808594a26.125012 26.125012 0 0 1-22.423969-39.187518c86.21254-147.715172 71.843783-195.93759 61.611487-209.217805-17.525529-23.512511-67.271906-12.844798-67.707323-12.735943a26.016158 26.016158 0 1 1-12.191672-50.617211c3.374481-0.870834 83.38233-19.267196 121.699014 32.656265 36.575017 49.202106 17.525529 136.394334-58.454714 266.475123a25.798449 25.798449 0 0 1-22.532823 12.627089z"
+                                        fill="#3C663E" opacity=".2" p-id="5727"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs6 layui-col-md3">
+                <div class="layui-card top-panel">
+                    <div class="layui-card-header">劣势副学科</div>
+                    <div class="layui-card-body">
+                        <div class="layui-row layui-col-space5">
+                            <div class="layui-col-xs8 layui-col-md8 top-panel-number" style="color: #28333E;"
+                                id="value4">
+                                -
+                            </div>
+                            <div class="layui-col-xs4 layui-col-md4 top-panel-tips">
+                                <svg t="1672145630708" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" p-id="5977" width="200" height="200">
+                                    <path
+                                        d="M929.9 502.7L926 386l-1.5-44.8c0-5.5-1.2-10.9-3.7-15.7-32.9-61.8-104.2-104.7-187.1-104.7-65.9 0-124.8 26.5-162.7 68.6v380c0 4.6-3.8 8.4-8.4 8.4s-8.4-3.8-8.4-8.4v-380c-37.9-42.1-96.8-68.6-162.7-68.6-82.9 0-154.2 42.9-187.1 104.7-2.6 4.8-3.7 10.3-3.7 15.7l-16.1 478.6c-0.4 12.6 12.4 20.8 24 15.9C250.2 818.1 313 816 369.9 816c81.6 0 138 27.7 170.1 67.8 3.3 4.2 8.2 6.8 13.6 6.8h17.7c5.3 0 10.2-2.6 13.6-6.8C617 843.7 673.6 816 755.2 816c56.9 0 119.7 2.1 161.3 19.6 11.6 4.9 24.5-3.3 24-15.9l-10.6-317z"
+                                        fill="#C5E5FF" p-id="5978"></path>
+                                    <path
+                                        d="M522.2 910h-20.5c-9 0-17.5-4.2-23.3-11.5-38.6-48.3-106-75-189.7-75-68.1 0-137.4 2.7-183.3 22-9.7 4.1-20.4 3-28.9-2.8-8.1-5.6-12.8-14.9-12.4-24.8L82.7 263c0-7.9 1.9-15.8 5.4-22.5C129 163.7 217.6 114 313.7 114c78.3 0 151.6 31.8 198.4 85.5 46.7-53.7 120-85.5 198.3-85.5 96.1 0 184.6 49.7 225.5 126.5 3.6 6.7 5.5 14.6 5.5 22.8L943 315c0.2 5.4-4 9.8-9.4 10-5 0.3-9.8-4-10-9.4l-1.7-52c0-5.4-1.1-10.1-3.2-14-37.5-70.6-119.3-116.2-208.3-116.2-76.4 0-147.3 32.3-189.9 86.3l-2.9 3.7h-11l-2.9-3.7c-42.7-54-113.7-86.3-190-86.3-89 0-170.8 45.6-208.4 116.2-2.1 3.9-3.2 8.6-3.2 13.7L83.4 818.5c-0.2 4.6 2.5 7.1 4.1 8.2 3 2 6.8 2.4 10.3 0.9 49-20.6 120.7-23.5 190.8-23.5 89.7 0 162.4 29.2 204.8 82.2 2.1 2.7 5.1 4.2 8.2 4.2h20.5c3.1 0 6-1.5 8.2-4.2 42.4-53 115.2-82.3 205-82.3 70.1 0 141.8 2.8 190.8 23.5 3.5 1.5 7.3 1.1 10.3-0.9 1.6-1.1 4.2-3.6 4.1-8.2l-12.4-367.6c-0.2-5.4 4-9.8 9.4-10h0.3c5.2 0 9.5 4.1 9.7 9.4L960 817.8c0.3 9.9-4.3 19.2-12.5 24.8-8.5 5.8-19.3 6.9-28.9 2.8-45.9-19.3-115.2-22-183.3-22-83.8 0-151.2 26.6-189.8 75-5.8 7.4-14.3 11.6-23.3 11.6z"
+                                        fill="#3B94FF" p-id="5979"></path>
+                                    <path
+                                        d="M520.7 664.7h-17.4c-0.5 0-1-0.5-1-1V205.6c0-0.6 0.5-1 1-1h17.4c0.5 0 1 0.4 1 1v458.1c0 0.6-0.4 1-1 1z"
+                                        fill="#3B94FF" p-id="5980"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md3">
+                <div class="layui-card">
+                    <div class="layui-card-header">你的信息</div>
+                    <div class="layui-card-body" id="person_info">
+                    </div>
+                </div>
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        更改查询问题
+                    </div>
+                    <div class="layui-card-body" style="line-height:40px;">
+                        <form class="layui-form" action="javascript:void(0);" lay-filter="setting">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">验证问题</label>
+                                <div class="layui-input-inline">
+                                    <input name="question" type="text" placeholder="问题，默认为你的农历生日" hover
+                                        class="layui-input" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">验证答案</label>
+                                <div class="layui-input-inline">
+                                    <input name="answer" type="text" placeholder="密码，默认为你的农历生日" hover
+                                        class="layui-input" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <button class="pear-btn pear-btn-success question" lay-submit lay-filter="setting_submit">
+                                    设 置
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md9">
+                <div class="layui-card">
+                    <div class="layui-card-header layui-form">成绩报表与成绩走图
+                        &nbsp;&nbsp;<input id="giveMark" lay-filter="giveMark" type="checkbox" name="giveMark" title="赋分成绩" lay-skin="primary" checked="">
+                    </div>
+                    <div class="layui-card-body" style="line-height:40px;">
+                        
+                        <table class="layui-table" id="data-table" lay-filter="data-table">
+                        </table>
+                        <div class="layui-tab custom-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                            <div id="echarts-records" style="background-color:#ffffff;min-height:550px;padding: 10px">
+                            </div>
+                        </div>
+                        小提示：点击上方的图例可以显示或隐藏指定的排名，你可以拖动折线图下面的滚动来调整折线范围。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+</body>
+<script id="personInfoHTML" type="text/html">
+    <ul class="list">
+        <div id="photo" style="text-align: center;"><a href="javascript:show_photo();">点击这里显示你的个人照片</a>
+        </div>
+        <%# for (let p of ['姓名', '性别', '班级', '选科', '寝室']) { %>
+        <li class="list-item">
+            <span class="title"><% p %></span>
+            <span class="footer"><% d.data[p] %></span>
+        </li>
+        <%# } %>
+        <li class="list-item">
+            <span class="title">详细信息</span>
+            <span class="footer"><a href="javascript:more_identity_info();">点击查看</a></span>
+        </li>
+    </ul>
+</script>
+
+
+<script>
+function getQueryString(name) {
+    var url = window.location.href;
+    name = name.replace(/[\[\]]/g, '\\$&');
+    var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+
+
+var student_name = getQueryString('name')
+var student_grade = getQueryString('grade')
+
+var student_info = null
+var student_exam = null
+
+// 详细身份信息
+function more_identity_info() {
+
+    var identity_text = ""
+
+    for (let key of ['姓名', '性别', '班级', '选科', '寝室', '身份证号', '毕业学校', '家庭住址']) {
+        identity_text += key + "：" + student_info[key] + "<br>"
+    }
+
+    layui.layer.open({
+        title: '详细身份信息',
+        content: identity_text
+    });
+
+}
+
+// 显示个人照片 =w=
+function show_photo() {
+    document.querySelector("#photo").innerHTML = '<img src="/schoolmanager/student/photo/view?name=' + student_name + '&grade=' + student_grade + '" width="33%"/>'
+}
+
+// 获取个人信息
+function getPersonInfo() {
+    layui.$.ajax({
+        url: '/schoolmanager/student/get?name=' + student_name + "&" + "grade=" + student_grade,
+        type: 'get',
+        success: function (result) {
+            if (result.msg) {
+                result.data['性别'] = result.data['性别'] == 1 ? "男" : "女"
+                result.data['查询设置'] = JSON.parse(result.data['查询设置']) 
+                student_info = result.data
+                layui.laytpl.config({
+                    open: '<%',
+                    close: '%>'
+                });
+                layui.laytpl(personInfoHTML.innerHTML).render({data: result.data}, function(string){
+                    document.querySelector("#person_info").innerHTML = string
+                    layui.form.val("setting", {question: result.data['查询设置']['验证问题'], answer: result.data['查询设置']['验证答案']})
+                });
+            }
+        }
+    })
+}
+
+// 渲染图标
+function drawChart() {
+    var echartsRecords = layui.echarts.init(document.getElementById('echarts-records'), 'walden');
+
+    // 定义图表配置选项
+    var option = {
+        backgroundColor: '#FFFFFF',
+        title: {
+            text: student_name + '的成绩走图'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'cross',
+                crossStyle: {
+                    color: '#999'
+                },
+                lineStyle: {
+                    type: 'dashed'
+                }
+            }
+        },
+        grid: {
+            top: '29%',
+            left: '3%',
+            right: '3%',
+            containLabel: true
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        legend:{
+        top:'10%',
+        show:true,
+        data:[]
+    },
+    xAxis:[{
+        type:'category',
+        data:[],
+        axisLine:{
+            lineStyle:{
+                color:'#999'
+            }
+        }
+    }],
+    yAxis:[{
+        type:'value',
+        inverse:true,
+        splitNumber : 4,
+        splitLine:{
+            lineStyle:{
+                type:'dashed',
+                color:'#DDD'
+            }
+        },
+        axisLine:{
+            show:false,
+            lineStyle:{
+                color:'#333'
+            }
+        },
+        nameTextStyle:{
+            color:'#999'
+        },
+        splitArea:{
+            show:false
+        }
+    }],
+    series:[{
+        name:'总分排名',
+        type:'line',
+        data:[]
+    }],
+    dataZoom:{show:true,realtime:true,start : 0,end : 100}
+    };
+
+    // 定义排名名称数组
+    var rankNames = ['总分排名', '语文排名', '数学排名', '外语排名', "政治排名", "历史排名", "地理排名", "物理排名", "化学排名", "生物排名", "技术排名", "主科排名", "副科排名"];
+
+    // 初始化数据数组
+    var examNames = [];
+    var rankData = {};
+    for (var i = 0; i < rankNames.length; i++) {
+        rankData[rankNames[i]] = [];
+    }
+
+    // 使用 for 循环提取数据
+    for (var i = 0; i < student_exam.length; i++) {
+        var item = student_exam[i];
+        examNames.push(item['考试名称']);
+        for (var j = 0; j < rankNames.length; j++) {
+            var rankName = rankNames[j];
+            if (rankName == "总分排名" & item['总分'] == 0) {
+                rankData[rankName].push(null);
+            } else {
+                rankData[rankName].push((item[rankName.replace("排名", "")] != null) ? item[rankName] : null);
+            }
+        }
+    }
+
+    // 更新图表配置选项
+    option.legend.data = rankNames;
+    option.legend.selected = {};
+    for (var i = 0; i < rankNames.length; i++) {
+        var rankName = rankNames[i];
+        option.legend.selected[rankName] = (rankName == '总分排名');
+    }
+    option.xAxis[0].data = examNames;
+    option.series = [];
+    for (var i = 0; i < rankNames.length; i++) {
+        var rankName = rankNames[i];
+        option.series.push({
+            name: rankName,
+            type: 'line',
+            data: rankData[rankName]
+        });
+    }
+
+    option.tooltip.formatter = function(params) {
+        
+        var result = params[0].name + '<br>';
+        for (var i = 0; i < params.length; i++) {
+          var data = params[i].value;
+          var dataIndex = params[i].dataIndex;
+          var seriesName = params[i].seriesName;
+          var color = params[i].color;
+          result += '<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:' + color + ';"></span>';
+      
+          result += seriesName + ': ' + data;
+          if (dataIndex > 0) {
+            var prevData = option.series[params[i].seriesIndex].data[dataIndex - 1];
+            if (prevData != null) {
+                var diff = data - prevData;
+                if (-diff >= 0) {
+                  result += "&nbsp;&nbsp;<a style='color: darkgreen;'>(" + (-diff >= 0 ? '+' : '') + (-diff) + ")</a>";
+                } else {
+                  result += "&nbsp;&nbsp;<a style='color: red;'>(" + (-diff >= 0 ? '+' : '') + (-diff) + ")</a>";
+                }
+            } else {
+                result += "&nbsp;&nbsp;<a>(不统计)</a>";
+            }
+          }
+          result += '<br>';
+        }
+        return result;
+      }
+      
+    // 设置图表选项
+    echartsRecords.setOption(option);
+}
+
+// 渲染考试成绩
+function getExams(giveMark) {
+    let cols = [
+        [
+            {type: 'radio'},
+            {field: '考试名称', minWidth: 100, title: '考试名称'},
+            {field: '姓名', minWidth: 100, title: '姓名'},   
+            {field: '语文', minWidth: 100, title: '语文'},
+            {field: '语文排名', minWidth: 100, title: '语文排名'},
+            {field: '数学', minWidth: 100, title: '数学'},
+            {field: '数学排名', minWidth: 100, title: '数学排名'},
+            {field: '外语', minWidth: 100, title: '外语'},
+            {field: '外语排名', minWidth: 100, title: '外语排名'},
+            {field: '政治', minWidth: 100, title: '政治'},
+            {field: '政治排名', minWidth: 100, title: '政治排名'},
+            {field: '历史', minWidth: 100, title: '历史'},
+            {field: '历史排名', minWidth: 100, title: '历史排名'}, 
+            {field: '地理', minWidth: 100, title: '地理'},
+            {field: '地理排名', minWidth: 100, title: '地理排名'},
+            {field: '物理', minWidth: 100, title: '物理'},
+            {field: '物理排名', minWidth: 100, title: '物理排名'},
+            {field: '化学', minWidth: 100, title: '化学'},
+            {field: '化学排名', minWidth: 100, title: '化学排名'},
+            {field: '生物', minWidth: 100, title: '生物'},
+            {field: '生物排名', minWidth: 100, title: '生物排名'},
+            {field: '技术', minWidth: 100, title: '技术'},
+            {field: '技术排名', minWidth: 100, title: '技术排名'},
+            {field: '主科', minWidth: 100, title: '主科'},
+            {field: '主科排名', minWidth: 100, title: '主科排名'},
+            {field: '副科', minWidth: 100, title: '副科'},
+            {field: '副科排名', minWidth: 100, title: '副科排名'},
+            {field: '总分', minWidth: 100, title: '总分'},
+            {field: '总分排名', minWidth: 100, title: '总分排名'}
+        ]
+    ]
+
+    layui.table.render({
+        elem: '#data-table',
+        id: 'data-table',
+        url:'/schoolmanager/examPublish/studentExams',
+        where: {
+            name: student_name,
+            grade: student_grade,
+            giveMark: giveMark ? "1" : "0"
+        },
+        method: 'post',
+        cols: cols,
+        page: false,
+        skin: 'line',
+        text: {none: '暂无考试信息'},
+        defaultToolbar: [{layEvent: 'refresh', icon: 'layui-icon-refresh'}, 'filter', 'print', 'exports'],
+        parseData: function(res) {
+            student_exam = res['data']
+        },
+        done: function (res, curr, count) {
+            // 选中第一行
+            layui.$(".layui-table-view[lay-id='data-table'] .layui-table-body tr[data-index=0] .layui-form-radio").click();
+            drawChart();
+            setTips();
+        }
+    })
+}
+
+
+// 排名与弱势学科判断
+function setTips() {
+    let filteredData = student_exam.filter(student => student['总分'] !== null);
+    let minRank = student_exam.reduce((min, student) => Math.min(min, student['总分排名']), Infinity);
+    let avgRank = filteredData.reduce((sum, student) => sum + student['总分排名'], 0) / filteredData.length;
+
+    layui.count.up('value1', {
+        time: 4000,
+        num: minRank,
+        regulator: 50
+    });
+
+    layui.count.up('value2', {
+        time: 4000,
+        num: avgRank,
+        regulator: 50
+    });
+
+    let subjectMap = {
+        '语': '语文',
+        '数': '数学',
+        '外': '外语',
+        '物': '物理',
+        '化': '化学',
+        '技': '技术',
+        '政': '政治',
+        '史': '历史',
+        '地': '地理',
+        '生': '生物'
+    };
+    let subjects = student_info['选科'].split('').map(subject => subjectMap[subject]);
+    let mainSubjects = ["语文", "数学", "外语"];
+    let minorSubjects = subjects.filter(subject => !["语文", "数学", "外语"].includes(subject));;
+
+    let lowestMainSubject = null;
+    let highestMainRank = -Infinity;
+    for (let subject of mainSubjects) {
+        let totalRank = 0;
+        let count = 0;
+        for (let exam of student_exam) {
+            if (exam[`${subject}排名`] !== null) {
+                totalRank += exam[`${subject}排名`];
+                count++;
+            }
+        }
+        let averageRank = totalRank / count;
+        if (averageRank > highestMainRank) {
+            lowestMainSubject = subject;
+            highestMainRank = averageRank;
+        }
+    }
+
+    let lowestMinorSubject = null;
+    let lowestMinorScore = Infinity;
+    for (let subject of minorSubjects) {
+        if (subject === lowestMainSubject) continue; // 跳过与主科相同的副科
+        let totalScore = 0;
+        let count = 0;
+        for (let exam of student_exam) {
+            if (exam[subject] !== null) {
+                totalScore += exam[subject];
+                count++;
+            }
+        }
+        let averageScore = totalScore / count;
+        if (averageScore < lowestMinorScore) {
+            lowestMinorSubject = subject;
+            lowestMinorScore = averageScore;
+        }
+    }
+
+    document.querySelector("#value3").textContent = lowestMainSubject
+    document.querySelector("#value4").textContent = lowestMinorSubject
+}
+
+layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 'table', 'laytpl', 'count'], function () {
+    var $ = layui.jquery,
+        echarts = layui.echarts,
+        loading = layui.loading,
+        table = layui.table,
+        form = layui.form,
+        button = layui.button,
+        laytpl = layui.laytpl,
+        toast = layui.toast,
+        count = layui.count;
+
+    // 开始加载
+    //loading.Load(2, "等待服务器处理信息......");
+
+    // 加载完毕
+    //loading.loadRemove();
+
+
+
+    
+   // 获取个人信息
+   getPersonInfo();
+   getExams(true);
+   
+   // 绑定事件
+   form.on('checkbox(giveMark)', function(data){
+        getExams(data.elem.checked)
+    });
+
+    // 设置验证问题
+    form.on('submit(setting_submit)', function(data){
+        data.field
+        $.ajax({
+            url: '/schoolmanager/student/setting',
+            data: {name: student_name, grade: student_grade, question: form.val("setting").question, answer: form.val("setting").answer},
+            type: 'get',
+            success: function(result) { 
+                if (result.success) {
+        
+                    toast.success({title: '修改查询设置成功', message: result.msg, position: 'topCenter'});
+                    layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    
+                } else {
+
+                    toast.error({title: '修改查询设置失败', message: result.msg, position: 'topCenter'});
+                    
+                }
+            }
+        })
+       
+        return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+
+    });
+
+
+})
+</script>
+</body>
+
+</html>

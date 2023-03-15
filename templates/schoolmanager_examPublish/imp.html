@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>导入数据</title>
+    {% include 'admin/common/header.html' %}
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .layui-form-select dl dd.layui-this {
+            background-color: #F6F6F6;
+            color: #000 !important;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="pear-container">
+    <div class="layui-col-md12">
+        
+        <div class="layui-card">
+            <div class="layui-card-body" style="padding-top: 40px;">
+                <div class="layui-carousel" id="stepForm" lay-filter="stepForm">
+                    <div carousel-item>
+                
+                        <form class="layui-form" action="javascript:void(0);">
+
+                            <iframe id="upload_iframe" src="/schoolmanager/utils/upload" height="500px" width="100%" frameborder="no"></iframe>
+                            
+                            <div class="layui-form-item">
+                                <div class="layui-input-block">
+                                    <button class="pear-btn pear-btn-success" lay-submit lay-filter="formStep">
+                                        &emsp;下一步&emsp;
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                
+                    <div>
+                            <form class="layui-form"  action="javascript:void(0);" lay-filter="ext">
+                                
+                                <div class="layui-form-item">
+                                    <div class="layui-col-md10">
+                                        <label class="layui-form-label">考试名称</label>
+                                        <div class="layui-input-block" id="exam_input">
+                                            <select name="examName" lay-verify="">
+                                                <option value="">请选择一个考试</option>
+                                                {# 表格 考试名称 输出 #}
+                                                {% for examName in examNames %}
+                                                <option value="{{ examName }}">{{ examName }}</option>
+                                                {% endfor %}
+                                            </select>   
+                                        </div>
+                                    </div>
+
+                                    <div class="layui-col-md2">
+                                        <button plain="" class="pear-btn pear-btn-success" style="width: 100%;" id="add_exam">添加新考试</button>
+                                    </div>
+                                    
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">考试的年段:</label>
+                                    <div class="layui-input-block">
+                                        <select name="grade" lay-verify="">
+                                            {# 表格 学生届数 输出 #}
+                                            {% for grade in grades %}
+                                                <option value="{{ grade }}">{{ grade }}届</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">是否赋分</label>
+                                    <div class="layui-input-block">
+                                      <input type="checkbox" name="giveMark" lay-skin="switch" checked>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center;">
+                                    <blockquote class="layui-elem-quote">
+                                        <b>姓名</b>列与<b>备注</b>列支持字符串，其余列若出现非数字，自动删除。<br>
+                                    </blockquote>
+                                </div>
+                                
+
+                                <iframe id="imp_iframe" height="800px" width="100%" frameborder="no"></iframe>
+                                
+                                <div style="text-align: center;">
+                                    <blockquote class="layui-elem-quote">
+                                        <b>替换数据</b>会将已有的学生数据直接覆盖，并插入没有的学生数据。<br>
+                                        <b>跳过数据</b>不修改已有的学生数据直接覆盖，插入没有的学生数据。<br>
+                                        <b>叠加数据</b>对于已有的学生数据且学生数据列未设置的，更新未设置的学生数据列，并插入没有的学生数据。<br>
+                                    </blockquote>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" style="width: 150px">对于已存在数据行：</label>
+                                    <div class="layui-input-block">
+                                      <input type="radio" name="mode" value="replace" title="替换">
+                                      <input type="radio" name="mode" value="skip" title="跳过">
+                                      <input type="radio" name="mode" value="add" title="叠加" checked>
+                                    </div>
+                                </div>    
+
+                                <div class="layui-form-item">
+                                    <div class="layui-input-block">
+                                        <button type="button" class="pear-btn pear-btn-success pre">上一步</button>
+                                        <button class="pear-btn pear-btn-success submit" lay-submit lay-filter="formStep2">
+                                            &emsp;确认导入&emsp;
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div>
+                            <div style="text-align: center;margin-top: 90px;">
+                                <i class="layui-icon layui-circle" style="color: white;font-size:30px;font-weight:bold;background: #52C41A;padding: 20px;line-height: 80px;">&#xe605;</i>
+                                <div style="font-size: 24px;color: #333;font-weight: 500;margin-top: 30px;">
+                                    导入成功
+                                </div>
+                                <div style="font-size: 14px;color: #666;margin-top: 20px;">请刷新网页</div>
+                            </div>
+                            <div style="text-align: center;margin-top: 50px;">
+                                <button class="pear-btn pear-btn-success pre">返回上步</button>
+                                <button class="pear-btn pear-btn-success refresh">刷新网页</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+{% include 'admin/common/footer.html' %}
+<script>
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+}
+
+var exam_input_html = "";  // 用于保存下拉框的代码，使用按钮进行切换
+
+layui.use(['jquery', 'layer', 'cropper', 'toast', 'upload', 'form', 'step', 'loading'], function () {
+        let $ = layui.jquery,
+        layer = layui.layer,
+        cropper = layui.cropper,
+        upload = layui.upload,
+        toast = layui.toast,
+        form = layui.form,
+        step = layui.step,
+        loading = layui.loading;
+
+        step.render({
+            elem: '#stepForm',
+            filter: 'stepForm',
+            width: '100%',
+            stepWidth: '600px',
+            height: '1500px',
+            stepItems: [{
+                title: '选择文件'
+            }, {
+                title: '确认导入数据'
+            }, {
+                title: '完成'
+            }]
+        });
+
+        form.on('submit(formStep)', function(data) {
+            if (document.querySelector("#upload_iframe").contentWindow.file == null) {
+                toast.warning({title: '未选择文件', message: "请先选择一个文件！", position: 'topCenter'});
+                return false;
+            }
+            loading.Load(3, "正在加载文件......");
+            document.querySelector("#imp_iframe").src = "/schoolmanager/utils/imp?engine=" + getQueryString("engine") + "&impColumns=姓名,语文,数学,外语,政治,历史,地理,物理,化学,生物,技术,备注&filename=" + document.querySelector("#upload_iframe").contentWindow.file['文件名']
+            document.querySelector("#imp_iframe").onload = function() {
+                if (document.querySelector("#imp_iframe").contentWindow.error == undefined) {
+                    step.next('#stepForm');
+                } else {
+                    toast.warning({title: '出现错误！', message: document.querySelector("#imp_iframe").contentWindow.error, position: 'topCenter'});
+                }
+                loading.loadRemove(0);
+                // 解除加载完毕回调
+                document.querySelector("#imp_iframe").onload = function (){}
+            }
+            return false;
+        });
+
+        form.on('submit(formStep2)', function(data) {
+            var iframeWindow = layui.$("#imp_iframe")[0].contentWindow; // 获取子iframe的window对象
+            var data = iframeWindow.layui.form.val("imp"); // 获取子iframe中指定表单集合的元素取值
+            
+            // 这里需要请求服务器接口
+            
+            loading.Load(3, "请不要刷新页面，正在导入数据......");
+
+
+            // 获取 iframe GET 请求参数
+            var url = document.querySelector("#imp_iframe").contentWindow.location.href;
+            var params = url.split("?")[1]; // 用?分割URL，取第二部分
+            var paramArr = params.split("&"); // 用&分割参数，得到一个数组
+            var paramObj = {}; // 定义一个空对象
+            for (var i = 0; i < paramArr.length; i++) { // 遍历数组
+                var key = paramArr[i].split("=")[0]; // 取每个参数的名字，即=前面的部分
+                var value = decodeURIComponent(paramArr[i].split("=")[1]); // 取每个参数的值，即=后面的部分
+                paramObj[key] = value; // 将参数名和值存入对象中
+            }
+
+            $.ajax({
+                url: '/schoolmanager/examPublish/imp',
+                data: JSON.stringify({args: paramObj, imp: data, ext: form.val("ext")}),
+                type: 'post',
+                contentType: "application/json",
+                success: function (result) {
+                    if (result.success) {
+                        toast.success({title: '导入成功', message: result.msg, position: 'topCenter'});
+                        loading.loadRemove(0);
+                        step.next('#stepForm');
+                        window.scrollTo(0, 0);
+                        return false;
+                    } else {
+                        toast.error({title: '导入失败', message: result.msg, position: 'topCenter'});
+                        loading.loadRemove(0);
+                        return false;
+                    }
+                }
+            })
+        });
+
+        $('.refresh').click(function() {
+            window.parent.location.reload();
+            return false;
+        });
+
+        $('.pre').click(function() {
+            step.pre('#stepForm');
+            window.scrollTo(0, 0);
+            return false;
+        });
+
+        $('.next').click(function() {
+            step.next('#stepForm');
+            window.scrollTo(0, 0);
+            return false;
+        });
+
+        // 添加考试
+        $("#add_exam").click(function() {
+            if (exam_input_html == "") {
+                exam_input_html = document.querySelector("#exam_input").innerHTML
+                document.querySelector("#add_exam").textContent = "选择考试"
+                document.querySelector("#exam_input").innerHTML = '<input type="text" name="examName"  placeholder="请输入考试名称" autocomplete="off" class="layui-input">'
+            }  else {
+                document.querySelector("#add_exam").textContent = "添加新考试"
+                document.querySelector("#exam_input").innerHTML = exam_input_html
+                exam_input_html = ""
+            }
+            form.render('select')
+        });
+
+ })
+
+
+</script>

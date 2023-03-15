@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>考试发布</title>
+    <style>
+        .layui-form-select dl dd.layui-this {
+            background-color: #F6F6F6;
+            color: #000 !important;
+            font-weight: 700;
+        }
+    </style>
+    {% include 'admin/common/header.html' %}
+</head>
+
+<body class="pear-container">
+<div>
+
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="exam-query-form">
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">毕业届数</label>
+                    <div class="layui-input-inline">
+                        <select name="grade" lay-verify="">
+                            <option value="">查询所有届数</option>
+                            {# 表格 学生届数 输出 #}
+                            {% for grade in grades %}
+                                <option value="{{ grade }}">{{ grade }}届学生数据</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                        
+                    <label class="layui-form-label">考试名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" placeholder="考试名称，支持正则表达式" class="layui-input">
+                    </div>
+                
+                    <label class="layui-form-label">日期范围</label>
+                    <div class="layui-inline" id="date_choose">
+                        <div class="layui-input-inline">
+                            <input type="text" autocomplete="off" name="startDate" id="startDate" class="layui-input"
+                                    placeholder="开始日期">
+                        </div>
+                        <div class="layui-form-mid">
+                            -
+                        </div>
+                        <div class="layui-input-inline">
+                            <input type="text" autocomplete="off" name="endDate" id="endDate" class="layui-input"
+                                    placeholder="结束日期">
+                        </div>
+                    </div>
+                    
+
+                    
+
+                    <button class="pear-btn pear-btn-primary" lay-submit lay-filter="exam-query">
+                        <i class="layui-icon layui-icon-search"></i>
+                        查询
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-warming" style="background-color: #000 !important;">
+                        <i class="layui-icon layui-icon-refresh"></i>
+                        重置
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">便捷操作</div>
+                <div class="layui-card-body" style="text-align: center;padding: 10px;">
+                    <button plain="" class="pear-btn pear-btn-success" id="info">查看考试</button>
+                    <button plain="" class="pear-btn pear-btn-danger" id="delete">删除考试</button>
+                    <button class="pear-btn pear-btn-success" id="add">添加考试</button>
+                    <button class="pear-btn pear-btn-warming" id="setting">查询设置</button>
+                    <button class="pear-btn pear-btn-success" id="imp" style="background-color: #319559 !important;">
+                        导入数据
+                        <i class="layui-icon layui-icon-down layui-font-12"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="layui-card">
+                <div class="layui-card-header">考试列表</div>
+                <div class="layui-card-body">
+                    <table id="data-table" lay-filter="data-table"></table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+{% include 'admin/common/footer.html' %}
+<script src="{{ url_for('schoolmanager.static', filename='js/examPublish/index.js') }}"></script>
+
+</html>

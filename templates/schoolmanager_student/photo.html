@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>证件照查看</title>
+    {% include 'admin/common/header.html' %}
+</head>
+<body class="pear-container">
+<div class="layui-row layui-col-space15">
+    <div class="layui-col-xs12">
+        <div style="height:325px;background-color: rgb(247, 247, 247);">
+            <img id="sourceImage" src="">
+        </div>
+    </div>
+</div>
+<div class="layui-row">
+    <div class="layui-form-item">
+        <button type="button" class="layui-btn" id="uploadPicture">
+            <i class="layui-icon">&#xe67c;</i>上传图片
+         </button>
+    </div>
+</div>
+</body>
+{% include 'admin/common/footer.html' %}
+<script>
+    layui.use(['jquery', 'layer', 'cropper', 'toast', 'upload'], function () {
+        let $ = layui.jquery,
+        layer = layui.layer,
+        cropper = layui.cropper,
+        upload = layui.upload,
+        toast = layui.toast;
+
+        let options = {
+            viewmode: 3,
+            dragMode: 'none',
+            movable: false,
+            zoomable: false,
+            cropBoxMovable: false,
+            cropBoxResizable: false,
+            guides: false,
+            autoCropArea: 1
+        }
+
+        $('#sourceImage').attr('src', './photo/view?grade={{ grade }}&name={{ name }}')
+        $('#sourceImage').cropper(options)
+        
+        var uploadInst = upload.render({
+            elem: '#uploadPicture',
+            url: './photo/upload',
+            data: {grade: {{ grade }}, name: '{{ name }}'},
+            done: function(res) {
+                layer.closeAll();
+                if(res.code == 0){
+                    // 显示上传成功
+                    toast.success({title: '文件上传成功', message: "保存文件成功。", position: 'topCenter'});
+                    window.location.reload()
+                } else {
+                    // 服务器处理错误
+                    toast.error({title: '文件上传失败', message: "文件上传失败！ERROR：" + res.msg, position: 'topCenter'});
+                }
+                
+            },
+            error: function() {
+                toast.error({title: '上传失败', message: "上传失败！服务器异常......" , position: 'topCenter'});
+            },
+            before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                layer.load(); //上传loading
+            }
+        });
+
+ })
+</script>

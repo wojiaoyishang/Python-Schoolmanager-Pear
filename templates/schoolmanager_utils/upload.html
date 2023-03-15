@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>文件上传</title>
+    {% include 'admin/common/header.html' %}
+</head>
+
+<body class="pear-container" style="background-color: white;">
+    <p>
+        <button type="button" class="layui-btn" id="upload_button">
+            <i class="layui-icon">&#xe67c;</i>上传文件
+        </button>
+    </p>
+    <br>
+    <p id="tip">点击选择文件，您也可以上传或删除文件。</p>
+    <p>
+        <table id="file-table" lay-filter="file-table"></table>
+    </p>
+</body>
+
+{# 用户修改操作 #}
+<script type="text/html" id="file-bar">
+    {% if authorize("SchoolManager:upload") %}
+        <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i
+                class="pear-icon pear-icon-ashbin"></i>
+        </button>
+    {% endif %}
+</script>
+
+{% include 'admin/common/footer.html' %}
+
+<script>
+// 选择的文件，方便父框架调用
+var file = null;
+
+layui.use(['upload', 'table', 'jquery', 'toast'], function(){
+    var upload = layui.upload,
+        table = layui.table,
+        toast = layui.toast,
+        $ = layui.jquery;
+    
+    // 表格载入
+    // 表格数据
+    let cols = [
+        [
+            {type:'radio'},
+            {field: '文件名', title: '文件名'},
+            {title: '操作', templet: '#file-bar', width: 120, align: 'center'}
+        ]
+    ];
+
+    // 渲染表格数据
+    file_table = table.render({
+        elem: '#file-table',
+        url:'./upload/files',
+        method: 'post',
+        page: false,
+        cols: cols,
+        skin: 'line',
+        height: 'full-148',
+        toolbar: '#file-toolbar',
+        text: {none: '暂无文件信息'},
+        defaultToolbar: [{layEvent: 'refresh', icon: 'layui-icon-refresh'}, 'filter', 'print', 'exports'], /*默认工具栏*/
+    })
+
+    // 文件删除操作
+    table.on('tool(file-table)', function (obj) {
+        if (obj.event === 'remove') {
+            window.remove(obj)
+        }
+    })
+
+    //执行实例
+    var uploadInst = upload.render({
+    elem: '#upload_button',
+    url: './upload',
+    accept: 'file',
+    done: function(res){
+        if(res.code == 0){
+            // 显示上传成功
+            document.querySelector("#tip").textContent = "文件上传成功！保存文件为：" + res.data.name;
+            toast.success({title: '文件上传成功', message: "保存文件为：" + res.data.name, position: 'topCenter'});
+            file_table.reload();
+        } else {
+            // 服务器处理错误
+            document.querySelector("#tip").textContent = "文件上传失败！ERROR：" + res.msg;
+            toast.error({title: '文件上传失败', message: "文件上传失败！ERROR：" + res.msg, position: 'topCenter'});
+        }
+    },
+    error: function(){
+        //请求异常回调
+        document.querySelector("#tip").textContent = "上传失败！服务器异常......" ;
+        toast.error({title: '上传失败', message: "上传失败！服务器异常......" , position: 'topCenter'});
+    },
+    progress: function(n, elem, res, index){
+        // 上传进度显示
+        var percent = n + '%';
+        document.querySelector("#tip").textContent = "文件上传进度：" + percent;
+      }
+    });
+
+
+    window.remove = function (obj) {
+        layer.confirm('确定要删除 ' + obj.data['文件名'] + " ？", {icon: 3, title: '提示'}, function (index) {
+            layer.close(index)
+            let loading = layer.load()
+            $.ajax({
+                url: './upload/files/' + obj.data['文件名'],
+                dataType: 'json',
+                type: 'delete',
+                success: function (result) {
+                    layer.close(loading)
+                    if (result.success) {
+                        toast.success({title: "删除成功", message: result.msg, position: 'topCenter'});
+                        file_table.reload();
+                    } else {
+                        toast.failure({title: "删除失败", message: result.msg, position: 'topCenter'});
+                    }
+                }
+            })
+        })
+    }
+
+    //监听行单击事件（双击事件为：rowDouble）
+    table.on('row(file-table)', function(obj) { 
+        var data = obj.data;
+        selected = data;
+        //选中行样式
+        obj.tr.addClass('layui-table-click').siblings().removeClass('layui-table-click');
+        //选中radio样式
+        obj.tr.find('i[class="layui-anim layui-icon"]').trigger("click");
+    })
+
+    // 单选框事件
+    table.on('radio(file-table)', function(obj) { 
+        file = obj.data;
+    });
+
+});
+</script>
+
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Excel表头读取</title>
+    <style>
+        .layui-form-select dl dd.layui-this {
+            background-color: #F6F6F6;
+            color: #000 !important;
+            font-weight: 700;
+        }
+    </style>
+    {% include 'admin/common/header.html' %}
+</head>
+
+<body class="pear-container">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <input name="filename" value="{{ args['filename'] }}" hidden>
+                    <input name="engine" value="{{ args['engine'] }}" hidden>
+                    <input name="impColumns" value="{{ args['impColumns'] }}" hidden>
+
+                    
+                    <label class="layui-form-label">工作表</label>
+                    <div class="layui-input-inline">
+                        <select name="sheetname" lay-verify="">
+                            {# 表格 sheet 输出 #}
+                            {% for sheet in sheets %}
+                            <option value="{{ sheet }}" {% if sheet == sheetname %} selected {% endif %}>{{ sheet }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                
+
+                
+                    <label class="layui-form-label">表头行</label>
+                    <div class="layui-input-inline" style="width:80px">
+                        <input type="number" name="header" autocomplete="off" class="layui-input" value={{ args['header'] }}>
+                    </div>
+                    
+                    <div class="layui-input-inline">
+                        <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="plugin-query">
+                            <i class="layui-icon layui-icon-search"></i>
+                            更改
+                        </button>
+                    </div>
+                </div>
+            </form>
+            此 Excel 中有 {{ sheets|length }} 张表。{{ sheetname }} 表中一共有 {{ length }} 数据，其中前 10 条数据如下：
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table lay-filter="data">
+                <thead>
+                    <tr>
+                    {# 数据表头 #}
+                    {% for column in columns %}
+                        <th lay-data="{field:'{{ column }}'}">{{ column }}</th>
+                    {% endfor %}
+                    </tr> 
+                </thead>
+                <tbody>
+                    {% for values in data %}
+                        <tr>
+                            {% for value in values %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-body">
+            {# 导入表头表单 #}
+            请选择对应导入的表头：
+            <form class="layui-form" action="javascript: function(){return 0}" id="imp" lay-filter="imp">
+                {% for impColumn in impColumns %}
+                    <div class="layui-input-inline">
+                        表头 {{ impColumn }} 导入
+                        <div class="layui-input-inline">
+                            <select name="{{ impColumn }}" lay-verify="">
+                                <option value="">-</option>
+                                {% for column in columns %}
+                                <option value="{{ column }}">{{ column }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        的数据
+                    </div><br>
+                {% endfor %}
+            </form>
+        </div>
+    </div>
+
+</body>
+
+{# 用户修改操作 #}
+<script type="text/html" id="file-bar">
+    {% if authorize("SchoolManager:upload") %}
+        <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i
+                class="pear-icon pear-icon-ashbin"></i>
+        </button>
+    {% endif %}
+</script>
+
+{% include 'admin/common/footer.html' %}
+
+<script>
+
+layui.use(['table'], function(){
+    var table = layui.table
+    
+    table.init('data', {
+        height: 400,
+        limit: 10,
+        size: "sm"
+    });
+});
+</script>
+
+</html>

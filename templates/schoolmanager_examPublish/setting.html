@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>考试分析</title>
+    <style>
+        .layui-form-select dl dd.layui-this {
+            background-color: #F6F6F6;
+            color: #000 !important;
+            font-weight: 700;
+        }
+    </style>
+    {% include 'admin/common/header.html' %}
+</head>
+
+<body class="pear-container">
+
+    <form class="layui-form" action="" lay-filter="setting-form">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题设置</label>
+            <div class="layui-input-block">
+                <input type="text" name="标题"  placeholder="默认标题为“学校数据查询”" value={{ settings['标题'] }} autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">提示设置</label>
+            <div class="layui-input-block">
+                <textarea name="提示" placeholder="若留空默认不设置提示" class="layui-textarea">{{ settings['提示'] }}</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">公告设置</label>
+            <div class="layui-input-block">
+                <textarea name="公告" placeholder="若留空默认不设置公告" class="layui-textarea">{{ settings['公告'] }}</textarea>
+            </div>
+        </div>
+
+        
+        
+    </form>
+
+</body>
+
+
+{% include 'admin/common/footer.html' %}
+<script src="{{ url_for('schoolmanager.static', filename='js/examAnalyse/index.js') }}"></script>
+<script>
+
+layui.use(['jquery', 'form'], function () {
+    let form = layui.form;
+})
+</script>
+
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>学生数据管理</title>
+    <style>
+        .layui-form-select dl dd.layui-this {
+            background-color: #F6F6F6;
+            color: #000 !important;
+            font-weight: 700;
+        }
+    </style>
+    {% include 'admin/common/header.html' %}
+</head>
+
+<body class="pear-container">
+<div>
+
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <form class="layui-form" action="" lay-filter="student-query-form">
+                <div class="layui-form-item">
+
+                    <label class="layui-form-label">毕业届数</label>
+                    <div class="layui-input-inline">
+                        <select name="grade" lay-verify="">
+                            {# 表格 学生届数 输出 #}
+                            {% for grade in grades %}
+                                <option value="{{ grade }}">{{ grade }}届学生数据</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label class="layui-form-label">班级</label>
+                    <div class="layui-input-inline">
+                        <select name="class" lay-verify="">
+                            <option value="0">全部班级</option>
+                            {# 表格 班级 输出 #}
+                            {% for class in classes %}
+                                <option value="{{ class }}">{{ class }} 班</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <label class="layui-form-label">姓名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" placeholder="学生姓名，支持正则表达式" class="layui-input">
+                    </div>
+
+                    <button class="pear-btn pear-btn-primary" lay-submit lay-filter="student-query">
+                        <i class="layui-icon layui-icon-search"></i>
+                        查询
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-warming" style="background-color: #000 !important;">
+                        <i class="layui-icon layui-icon-refresh"></i>
+                        重置
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md4">
+            <div class="layui-card">
+                <div class="layui-card-header">学生列表</div>
+                <div class="layui-card-body">
+                    <table id="data-table" lay-filter="data-table"></table>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-col-md8">
+
+            <div class="layui-card">
+                <div class="layui-card-header">便捷操作</div>
+                <div class="layui-card-body" style="text-align: center;padding: 10px;">
+                    <button plain="" class="pear-btn pear-btn-success" id="add_class">添加新班级</button>
+                    <button plain="" class="pear-btn pear-btn-warming" id="add_student">添加新学生</button>
+                    <button plain="" class="pear-btn pear-btn-danger" id="delete_student">删除此学生</button>
+                    <button class="pear-btn pear-btn-warming" id="see_photo">查看证件照</button>
+                    <button class="pear-btn pear-btn-success" id="add_grade">添加新年段</button>
+                    <button class="pear-btn pear-btn-danger" id="delete_grade">删除此年段</button>
+                    <button class="pear-btn pear-btn-success" id="imp" style="background-color: #319559 !important;">
+                        导入数据
+                        <i class="layui-icon layui-icon-down layui-font-12"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-header">学生信息</div>
+                <div class="layui-card-body">
+                    <form class="layui-form" action="" lay-filter="student-info-form">
+                        <div class="layui-form-item">
+                            <div class="layui-col-md3">
+                                <label class="layui-form-label">姓名</label>
+                                <div class="layui-input-block">
+                                    <input id="表单姓名" type="text" name="姓名" required lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input" disabled>
+                                </div>
+                            </div>
+                            <div class="layui-col-md3">
+                                <select name="性别" lay-verify="">
+                                    <option value="0">女</option>
+                                    <option value="1">男</option>
+                                    <option value="-1">未定义</option>
+                                </select>
+                            </div>
+                            <div class="layui-col-md3">
+                                <select name="班级" lay-verify="">
+                                    {# 表格 班级 输出 #}
+                                    {% for class in classes %}
+                                        <option value="{{ class }}">{{ class }} 班</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="layui-col-md3">
+                                <select id="表单届数" name="届数" lay-verify="" disabled>
+                                    {# 表格 学生届数 输出 #}
+                                    {% for grade in grades %}
+                                        <option value="{{ grade }}">{{ grade }}届</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">家庭住址</label>
+                            <div class="layui-input-block">
+                                <input id="家庭住址" type="text" name="家庭住址"  placeholder="请输入家庭住址" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">寝室号</label>
+                            <div class="layui-input-block">
+                                <input id="寝室" type="text" name="寝室"  placeholder="请输入寝室" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">毕业学校</label>
+                            <div class="layui-input-block">
+                                <input id="毕业学校" type="text" name="毕业学校"  placeholder="请输入毕业学校" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">身份证号</label>
+                            <div class="layui-input-block">
+                                <input id="身份证号" type="text" name="身份证号" placeholder="请输入身份证号" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">选科</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="选科_语" title="语文" lay-skin="primary" checked disabled>
+                                <input type="checkbox" name="选科_数" title="数学" lay-skin="primary" checked disabled>
+                                <input type="checkbox" name="选科_外" title="外语" lay-skin="primary" checked disabled>
+
+                                <input type="checkbox" name="选科_政" title="政治" lay-skin="primary">
+                                <input type="checkbox" name="选科_史" title="历史" lay-skin="primary">
+                                <input type="checkbox" name="选科_地" title="地理" lay-skin="primary">
+                                <input type="checkbox" name="选科_物" title="物理" lay-skin="primary">
+                                <input type="checkbox" name="选科_化" title="化学" lay-skin="primary">
+                                <input type="checkbox" name="选科_生" title="生物" lay-skin="primary">
+                                <input type="checkbox" name="选科_技" title="技术" lay-skin="primary">
+
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-block">
+                                <textarea name="备注" placeholder="请输入备注" class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="layui-form-item" style="text-align: right">
+                            <button id="submit_update" class="pear-btn pear-btn-md pear-btn-primary student-info-update" lay-submit lay-filter="student-info-update">
+                                更新学生数据
+                            </button>
+                            <button id="submit_add" class="pear-btn pear-btn-md pear-btn-primary student-info-add" lay-submit lay-filter="student-info-add" style="display: none;">
+                                添加学生数据
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+</div>
+</body>
+{% include 'admin/common/footer.html' %}
+<script src="{{ url_for('schoolmanager.static', filename='js/student/index.js') }}"></script>
+
+
+</html>
