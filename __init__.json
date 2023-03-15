@@ -1,0 +1,5 @@
+{
+  "plugin_name": "学校数据管理模块",
+  "plugin_version": "1.0.0.1",
+  "plugin_description": "为老师提供快捷的成绩整理工具，为学生提供快捷的学分查询工具。"
+}
