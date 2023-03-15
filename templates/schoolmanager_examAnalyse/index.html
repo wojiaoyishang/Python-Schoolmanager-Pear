@@ -27,7 +27,9 @@
                             <div class="layui-input-inline">
                                 <select name="grade">
                                     {% for grade in grades %}
+                                    {% if grade != "" %}
                                     <option value="{{ grade }}">{{ grade }}届学生数据</option>
+                                    {% endif %}
                                     {% endfor %}
                                 </select>
                             </div>
