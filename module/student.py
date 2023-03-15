@@ -30,6 +30,9 @@ def get_grades():
     data = []
     for d in cur.fetchall():
         data.append(int(d[0].replace("届学生数据", "")))
+    
+    if len(data) == 0:
+        data = [""]
         
     cur.close()
 
@@ -41,13 +44,20 @@ def get_all_class(grade):
     
     :param grade: 毕业届
     """
+    if grade == "":
+        return [""]
+    
     studentData_con = sqlite3.connect(dir_path + "/data/studentData.db")  # 连接学生数据库
+    
     
     cur = studentData_con.cursor()
     cur.execute(f""" SELECT 班级 FROM "{grade}届学生数据" GROUP BY 班级; """) 
 
     data = [_[0] for _ in cur.fetchall() if _[0] is not None]
     
+    if len(data) == 0:
+        data = [""]
+        
     cur.close()
     studentData_con.close()
 
