@@ -52,11 +52,14 @@
 - [X] 后台成绩基本分析功能
 - [X] Excel 导入功能
 - [X] 前台学生成绩基本查询与成绩分析
+- [ ] 学分管理功能
 - [ ] 前台学生各次考试分析
+- [ ] 时光邮局（学生给未来的自己寄信）
 - [ ] 学生 PK 功能（学生与学生对比）
 - [ ] 历次考试对比功能（考试与考试对比）
 - [ ] Excel 导出功能
 - [ ] 多学校管理功能
+
 
 ## 安装教程
 
@@ -138,25 +141,47 @@ PLUGIN_ENABLE_FOLDERS = ["helloworld", "SchoolManager"]
 **注意：如果文件夹不是“SchoolManager”，则需要修改上述的名称为您创建的文件夹的名称。**
 
 
-## 使用说明
+## 目录架构
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+```
+│  init_examAnalyse.py    # 考试分析视图、API初始化
+│  init_examPublish.py    # 考试发布功能视图、API初始化
+│  init_student.py    # 学生管理视图、API初始化
+│  init_utils.py    # 文件上传功能、导入功能初始化
+│  __init__.json    # 插件介绍文件
+│  __init__.py    # 插件初始化文件
+│
+├─data
+│  │  examData.db    # 成绩数据库
+│  │  studentData.db    # 学生数据数据库
+│  │  systemData.db    # 系统设置数据库
+│  │
+│  └─photos    # 保存学生证件照文件夹
+├─module
+│      examAnalyse.py    # 考试分析内置函数（直接操作数据库）
+│      examPublish.py    # 考试发布内置函数（直接操作数据库）
+│      setting.py    # 系统设置内置函数（直接操作数据库）
+│      student.py    # 学生管理内置函数（直接操作数据库）
+│
+├─static    # 前端资源文件夹
+│
+├─templates    # 前段页面模板
+│
+├─upload    # 文件上传保存文件夹
+│
+└─utils    # 实用函数文件夹
+    │  __init__.py 
+    │
+    ├─engines    # 导入引擎
+    │      excel.py
+    │
+    └─tools
+```
 
-## 参与贡献
+## 其它说明
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+### 如何批量导入学生证件照
+
+目前不支持后台批量导入，若要批量导入请打开 data/photos 文件夹，找到对应的年段（比如2024届毕业，文件夹就是2024；如果没有请手动创建），然后拷贝所有学生证件照到此文件夹中。文件格式应该为：```学生姓名.jpg```
 
 
-## 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
