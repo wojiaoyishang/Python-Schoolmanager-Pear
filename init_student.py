@@ -36,7 +36,10 @@ def photo_view():
     """
     学生证件照主页面
     """
-    grade = request.args.get('grade', str(student.get_grades()[0]))
+    grades = student.get_grades()
+    if len(grades) == 0:
+        return fail_api("No grade.")
+    grade = request.args.get('grade', str(grades[0]))
     name = str_escape(request.args.get('name'))
     
     return render_template("schoolmanager_student/photo.html", grade=grade, name=name)
@@ -46,7 +49,10 @@ def photo():
     """
     学生证件照
     """
-    grade = request.args.get('grade', str(student.get_grades()[0]))
+    grades = student.get_grades()
+    if len(grades) == 0:
+        return fail_api("No grade.")
+    grade = request.args.get('grade', str(grades[0]))
     name = str_escape(request.args.get('name'))
     
     if name is None:
@@ -158,7 +164,10 @@ def data():
     page = int(request.form.get('page', 0))
     limit = int(request.form.get('limit', 10))
     
-    grade = request.form.get('grade', str(student.get_grades()[0]))
+    grades = student.get_grades()
+    if len(grades) == 0:
+        return fail_api("没有年段。")
+    grade = request.form.get('grade', str(grades[0]))
     class_ = request.form.get('class', "0")
     name = str_escape(request.form.get('name'))
     
