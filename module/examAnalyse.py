@@ -121,6 +121,8 @@ def get_specMarkStudent_by_class(index, giveMark):
     data = {}
 
     for d in cur.fetchall():
+        if d[0] is None:
+            continue
         data[d[0]] = d[1]
     
     cur.close()
