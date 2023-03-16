@@ -61,7 +61,7 @@ def photo():
     if name is None:
         return fail_api(msg="Bad name.")
     
-    if not "SchoolManager:student" in session.get('permissions', []) or (session.get("schoolmanager_name") == name and int(session.get("schoolmanager_grade")) == grade):
+    if  "SchoolManager:student" in session.get('permissions', []) or (session.get("schoolmanager_name") == name and int(session.get("schoolmanager_grade")) == grade):
     
         name = name.replace("/", "").replace("\\", "").replace(".", "")
         
@@ -205,7 +205,7 @@ def get():
         return fail_api(msg="没有提供正确的参数。")
 
     try:
-        if not "SchoolManager:student" in session.get('permissions', []) or (session.get("schoolmanager_name") == name and int(session.get("schoolmanager_grade")) == grade):
+        if  "SchoolManager:student" in session.get('permissions', []) or (session.get("schoolmanager_name") == name and int(session.get("schoolmanager_grade")) == grade):
             student_data = student.get_student_data(name, grade)
             
             if student_data['查询设置'] in (None, ''):
@@ -392,7 +392,7 @@ def setting():
         return fail_api(msg="没有提供正确的参数。")
     
     try:
-        if not "SchoolManager:student" in session.get('permissions', []) or (session.get("schoolmanager_name") == name and int(session.get("schoolmanager_grade")) == grade):
+        if  "SchoolManager:student" in session.get('permissions', []) or (session.get("schoolmanager_name") == name and int(session.get("schoolmanager_grade")) == grade):
             question = request.args.get('question', None)
             answer = request.args.get('answer', None)
             if question in (None, '') or answer in (None, ''):
