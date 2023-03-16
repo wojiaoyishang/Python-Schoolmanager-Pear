@@ -20,6 +20,30 @@
 
 **采用 IDE：** ```Visual Studio Code```  _推荐使用 Visual Studio Code、PyCharm 等IDE开发_ 
 
+## 快速预览
+
+|  |  |
+|---------------------|---------------------|
+|![输入图片说明](images/image1.png)| ![输入图片说明](images/image2.png) |
+|![输入图片说明](images/image3.png)| ![输入图片说明](images/image4.png) |
+|![输入图片说明](images/image5.png)| ![输入图片说明](images/image6.png) |
+|![输入图片说明](images/image7.png)| ![输入图片说明](images/image8.png) |
+
+
+## 设计计划
+
+
+- [X] 后台学生信息管理
+- [X] 后台成绩发布功能
+- [X] 后台成绩基本分析功能
+- [X] Excel 导入功能
+- [X] 前台学生成绩基本查询与成绩分析
+- [ ] 前台学生各次考试分析
+- [ ] 学生 PK 功能（学生与学生对比）
+- [ ] 历次考试对比功能（考试与考试对比）
+- [ ] Excel 导出功能
+- [ ] 多学校管理功能
+
 ## 安装教程
 
 ### 安装 Python
@@ -80,6 +104,25 @@ pip install -r requirement\requirement.txt
 # 使用 pip 安装必要模块（对于 master 分支）
 python -m pip install -r requirement\requirement.txt
 ```
+
+### 安装学校数据管理插件（Python Schoolmanager Pear）
+
+克隆此仓库的所有文件到 Pear Admin Flask 的 plugins/SchoolManager 文件夹下（需要手动创建 SchoolManager 文件夹），并在 ```.flaskenv``` 文件中做如下修改：
+
+```
+# 插件配置
+PLUGIN_ENABLE_FOLDERS = ["helloworld"]
+```
+
+添加（或替换上）```SchoolManager```，如：
+
+```
+# 插件配置
+PLUGIN_ENABLE_FOLDERS = ["helloworld", "SchoolManager"]
+```
+
+**注意：如果文件夹不是“SchoolManager”，则需要修改上述的名称为您创建的文件夹的名称。**
+
 
 ## 使用说明
 
