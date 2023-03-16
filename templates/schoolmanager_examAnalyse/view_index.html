@@ -11,7 +11,206 @@
 	.layui-form {
 		width: 320px !important;
 		margin: auto !important;
+		margin-top: 160px !important;<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    {% include 'admin/common/header.html' %}
+    <title>{{ settings['标题'] }}</title>
+    <!-- 样 式 文 件 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin/component/pear/css/pear.css') }}"/>
+
+	<style>
+	.layui-form {
+		width: 320px !important;
+		margin: auto !important;
 		margin-top: 160px !important;
+	}
+
+	.layui-form button {
+		width: 100% !important;
+		height: 44px !important;
+		line-height: 44px !important;
+		font-size: 16px !important;
+		background-color: #5FB878 !important;
+		font-weight: 550 !important;
+	}
+
+	.layui-form-checked[lay-skin=primary] i {
+		border-color: #5FB878 !important;
+		background-color: #5FB878 !important;
+		color: #fff !important;
+	}
+
+	.layui-tab-content {
+		margin-top: 15px !important;
+		padding-left: 0px !important;
+		padding-right: 0px !important;
+	}
+
+	.layui-form-item {
+		margin-top: 20px !important;
+	}
+
+	.layui-input {
+		height: 44px !important;
+		line-height: 44px !important;
+		padding-left: 15px !important;
+		border-radius: 3px !important;
+	}
+
+	.layui-input:focus {
+		box-shadow: 0px 0px 2px 1px #5FB878 !important;
+	}
+
+	.layui-form-danger:focus{
+		box-shadow: 0px 0px 2px 1px #f56c6c !important;
+	}
+
+    .layui-form-select dl dd.layui-this {
+        background-color: #F6F6F6;
+        color: #000 !important;
+        font-weight: 700;
+    }
+
+    .code {
+        float: left;
+        margin-right: 13px;
+        margin: 0px !important;
+        border: #e6e6e6 1px solid;
+        display: inline-block!important;
+    }
+    
+    .codeImage {
+        float: right;
+        height: 42px;
+        border: #e6e6e6 1px solid;
+    }
+    
+    @media (max-width:768px){
+        body{
+            background-position:center;
+        }
+    }
+	</style>
+</head>
+<!-- 代 码 结 构 -->
+<body>
+<div class="layui-row layui-col-space10">
+    <form class="layui-form" action="javascript:void(0);">
+        <div class="layui-form-item">
+            <h1 class="title" style="color: #000000 !important;text-align: center !important;">{{ settings['标题'] }}</h1>
+        </div>
+
+        <div class="layui-form-item">
+            <div style="width: 100% !important;text-align: center !important;color: gray !important;">
+                {{ settings['提示'].replace("\n", "<br>")|safe }}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <input name="name" type="text" placeholder="同学的姓名" hover class="layui-input" required lay-verify="required" />
+        </div>
+        <div class="layui-form-item">
+            <select name="grade" lay-verify="">
+                {% for grade in grades %}
+                {% if grade != "" %}
+                <option value="{{ grade }}">{{ grade }}届毕业生</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="layui-form-item">
+            <input placeholder="输入验证码" name="captcha" hover class="code layui-input layui-input-inline" lay-verify="required"/>
+            <img src="{{ url_for('passport.get_captcha') }}" class="codeImage" id="captchaImage"/>
+        </div>
+        <div class="layui-form-item">
+            <button class="pear-btn pear-btn-success login" lay-submit lay-filter="check">
+                查 询
+            </button>
+        </div>
+    </form>
+</div>
+
+{% include 'admin/common/footer.html' %}
+<script>
+    layui.use(['form', 'jquery', 'layer', 'button', 'popup'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let layer = layui.layer;
+        let button = layui.button;
+        let popup = layui.popup;
+        let captchaPath = "{{ url_for('passport.get_captcha') }}";
+
+        {% if settings['公告'] not in (None, '') %}
+        layer.open({
+            title: '公告',
+            content: "{{ settings['公告'].replace("\n", "<br>")|safe }}"
+        });
+        {% endif %}
+
+        form.on('submit(check)', function (data) {
+            let loader = layer.load();
+            let btn = button.load({elem: '.login'});
+
+            $.ajax({
+                data: data.field,
+                type: "post",
+                dataType: 'json',
+                success: function (result) {
+                    layer.close(loader);
+                    btn.stop(function () {
+                            if (result.success) {
+
+                                layer.prompt({
+                                        title: result.msg
+                                    }, function (value, index, elem) {
+                                        $.ajax({
+                                            data: {name: data.field.name, grade:data.field.grade, answer: value, captcha:data.field.captcha},
+                                            type: "post",
+                                            success: function (result) {
+                                                if (result.success) {
+                                                    layer.close(index);
+                                                    popup.success(result.msg, function () {
+                                                        window.location.href = window.location.href + '/analyse?name=' + data.field.name + '&grade=' + data.field.grade
+                                                    });
+                                                } else {
+                                                    popup.failure(result.msg, function () {});
+                                                    layer.close(index);
+                                                }
+                                            }
+                                        })
+                                });
+                                
+                            } else {
+                                popup.failure(result.msg, function () {
+                                    document.getElementById("captchaImage").src = captchaPath + "?" + Math.random();
+                                });
+                            }
+                        }
+                    )
+                }
+            });
+
+
+            return false;
+        })
+        ;
+
+        $("#captchaImage").click(function () {
+            document.getElementById("captchaImage").src = captchaPath + "?" + Math.random();
+        });
+        setInterval(function () {
+            document.getElementById("captchaImage").src = captchaPath + "?" + Math.random();
+        }, 60 * 1000);
+    })
+</script>
+<script>
+    if (window !== top) {
+        top.location.href = location.href;
+    }
+</script>
+</body>
+</html>
 	}
 
 	.layui-form button {
