@@ -115,7 +115,7 @@ venv\Scripts\activate
 
 ```shell
 # 使用 pip 安装必要模块（对于 master 分支）
-pip install -r requirement\requirement.txt
+pip install -r requirement\dev.txt
 
 # 安装原 pear admin flask 的缺少库
 pip install sqlalchemy==1.4.46
@@ -129,6 +129,12 @@ pip install pandas
 ```shell
 # 使用 pip 安装必要模块（对于 master 分支）
 python -m pip install -r requirement\requirement.txt
+
+# 安装原 pear admin flask 的缺少库
+python -m pip install sqlalchemy==1.4.46
+
+# 安装 此项目依赖
+python -m pip install pandas
 ```
 
 ### 安装学校数据管理插件（Python Schoolmanager Pear）
