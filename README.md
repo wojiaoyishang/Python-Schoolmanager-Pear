@@ -116,6 +116,12 @@ venv\Scripts\activate
 ```shell
 # 使用 pip 安装必要模块（对于 master 分支）
 pip install -r requirement\requirement.txt
+
+# 安装原 pear admin flask 的缺少库
+pip install sqlalchemy==1.4.46
+
+# 安装 此项目依赖
+pip install pandas
 ```
 
 或者您可以尝试：
