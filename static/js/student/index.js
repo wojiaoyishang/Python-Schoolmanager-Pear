@@ -87,9 +87,12 @@ layui.use(['table', 'form', 'jquery', 'layer', 'button', 'toast', 'dropdown'], f
                     };
                     
                     // 处理选科数据
-                    for (var i = 0; i < result.data['选科'].length; i++) {
-                        subjects['选科_' + result.data['选科'][i]] = true;
+                    if (result.data['选科'] != undefined) {
+                        for (var i = 0; i < result.data['选科'].length; i++) {
+                            subjects['选科_' + result.data['选科'][i]] = true;
+                        }
                     }
+                    
 
                     form.val("student-info-form", Object.assign({}, { 
                         "姓名": result.data['姓名'],
