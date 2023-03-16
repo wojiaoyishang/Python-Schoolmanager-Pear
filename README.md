@@ -5,7 +5,7 @@
     Python Schoolmanager Pear
   </h1>
   <h4 align="center">
-    专 注 于 高 效 率 的 学 校 数 据 管 理 项 目
+    一 个 灵 活 的 学 校 数 据 管 理 项 目
   </h4> 
 
 </div>
