@@ -31,9 +31,6 @@ def get_grades():
     for d in cur.fetchall():
         data.append(int(d[0].replace("届学生数据", "")))
     
-    if len(data) == 0:
-        data = [""]
-        
     cur.close()
 
     return data
