@@ -25,7 +25,10 @@ def index():
     """
     # 获取所有数据库数据
     grades = student.get_grades()  # 所有届数
-    classes = student.get_all_class(grades[0])  # 所有班级（默认第一个年段）
+    if len(grades) == 0:
+        classes = []
+    else:
+        classes = student.get_all_class(grades[0])  # 所有班级（默认第一个年段）
     
     return render_template("schoolmanager_examPublish/index.html", grades=grades, classes=classes)
 
