@@ -258,7 +258,7 @@ def view_analyse():
     if grade == -1 or name is None:
         return fail_api(msg="没有提供正确的参数。")
     
-    if session.get('SchoolManager:student') or (session.get("schoolmanager_name") == name and int(session.get("schoolmanager_grade")) == grade):
+    if session.get('SchoolManager:student') or (session.get("schoolmanager_name") == name and session.get("schoolmanager_grade") == grade):
         return render_template("schoolmanager_examAnalyse/view_analyse.html")
     else:
         return "<script>window.location.href = '/schoolmanager/examAnalyse/view'</script>"
