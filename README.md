@@ -199,4 +199,8 @@ PLUGIN_ENABLE_FOLDERS = ["helloworld", "SchoolManager"]
 
 目前不支持后台批量导入，若要批量导入请打开 data/photos 文件夹，找到对应的年段（比如2024届毕业，文件夹就是2024；如果没有请手动创建），然后拷贝所有学生证件照到此文件夹中。文件格式应该为：```学生姓名.jpg```
 
+### 前台查询页面地址
+
+地址为： http(s)://你的域名（或者是IP地址）/schoolmanager
+
 
