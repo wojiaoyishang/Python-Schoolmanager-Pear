@@ -155,6 +155,61 @@ PLUGIN_ENABLE_FOLDERS = ["helloworld", "SchoolManager"]
 
 **注意：如果文件夹不是“SchoolManager”，则需要修改上述的名称为您创建的文件夹的名称。**
 
+### 运行项目
+
+#### Flask —— 调试模式下运行
+
+如果你想在调试模式下运行此项目请使用下面的命令：
+
+```shell
+flask run
+```
+
+或者尝试
+
+```shell
+python -m flask run
+```
+
+当然，你也可以调用项目中的 ```app.py``` 运行此项目，如：
+
+```shell
+python app.py
+```
+
+_在实际调试过程中，如果遇到了资源文件加载不完全的情况，请多刷新几次网页，具体原因未知，可能是 Flask 版本的问题。_
+
+#### pywsgi —— 发布项目
+
+如果你只是作为此项目的用户，你可以通过如下的方式更加稳定的运行项目。
+
+安装 pywsgi ：
+
+```shell
+pip install gevent
+```
+
+并修改 app.py 中的内容为：
+
+```python
+from applications import create_app
+from flask_migrate import Migrate
+from applications.extensions import db
+
+from gevent import pywsgi
+
+app = create_app()
+
+
+migrate = Migrate(app, db)
+
+if __name__ == '__main__':
+    # app.run()
+    server = pywsgi.WSGIServer(('0.0.0.0', 7000), app, log=None)
+    server.serve_forever()
+```
+
+上述中的 ```7000``` 为运行端口， ```0.0.0.0``` 为绑定的IP地址。
 
 ## 目录架构
 
