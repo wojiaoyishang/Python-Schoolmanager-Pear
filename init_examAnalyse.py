@@ -253,9 +253,9 @@ def view_analyse():
     成绩分析
     """
     name = request.args.get('name')
-    grade = int(request.args.get('grade', -1))
+    grade = request.args.get('grade', "-1")
     
-    if grade == -1 or name is None:
+    if not grade.isdigit() or name is None:
         return fail_api(msg="没有提供正确的参数。")
     
     if session.get('SchoolManager:student') or (session.get("schoolmanager_name") == name and session.get("schoolmanager_grade") == grade):
