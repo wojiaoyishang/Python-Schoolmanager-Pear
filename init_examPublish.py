@@ -366,9 +366,9 @@ def studentExams():
     # 判断提供参数正确
     if not grade.isdigit() or grade == '':
         grade = None
-    
+
     try:
-        if "SchoolManager:examPublish" in session.get('permissions', []) or (session.get("schoolmanager_name") == name and int(session.get("schoolmanager_grade")) == grade):
+        if ("SchoolManager:examPublish" in session.get('permissions', [])) or (session.get("schoolmanager_name") == name and session.get("schoolmanager_grade") == grade):
             # 获取所有考试
             exams = examPublish.get_all_exam(fields="`index`, 考试名称", grade=grade, page=None, limit=None)['data']
             data = []
