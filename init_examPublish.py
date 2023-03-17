@@ -375,6 +375,8 @@ def studentExams():
             for d in exams:
                 index, exam_name = d['index'], d['考试名称']
                 _ = examPublish.get_exam(index=index, name=name, giveMark=giveMark)['data']
+                if len(_) == 0:
+                    continue
                 _[0]['考试名称'] = exam_name
                 data.append(_[0])
             return table_api(msg="success", data=data)
