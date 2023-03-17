@@ -66,6 +66,12 @@
 
 ## 安装教程
 
+### windows系统的视频教程
+
+如果您不想看繁琐的步骤请移步视频安装教程：
+
+[https://www.bilibili.com/video/BV1h84y1w7ur/](https://www.bilibili.com/video/BV1h84y1w7ur/)
+
 ### 安装 Python
 
 安装 Python 过程不过多赘述，请到 [Python 官网](https://www.python.org/) 下载。如果您不想要复杂的安装步骤，我们推荐使用**虞颖健**老师打包的 [Python 懒人版](https://gitee.com/yu-yingjian/day_day_up?_from=gitee_search)。点击查看 --> [视频安装教程](https://www.bilibili.com/video/BV1Vd4y197se/?spm_id_from=333.999.0.0)
