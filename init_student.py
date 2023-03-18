@@ -397,7 +397,6 @@ def setting():
             answer = request.args.get('answer', None)
             if question in (None, '') or answer in (None, ''):
                 return fail_api("验证问题或者密码不能为空！")
-            print(question, answer)
             student.set_setting(name, grade, '验证问题', question)
             student.set_setting(name, grade, '验证答案', answer)
             return success_api("设置成功！")
