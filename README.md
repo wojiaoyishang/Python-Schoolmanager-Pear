@@ -161,6 +161,10 @@ PLUGIN_ENABLE_FOLDERS = ["helloworld", "SchoolManager"]
 
 **注意：如果文件夹不是“SchoolManager”，则需要修改上述的名称为您创建的文件夹的名称。**
 
+#### 导入 Pear Admin Flask 初始化数据库
+
+将 ```pear.sql``` 文件导入搭建的 MySQL 数据库，并在 ```.flaskenv``` 文件中配置正确的数据库信息。
+
 ### 运行项目
 
 #### Flask —— 调试模式下运行
