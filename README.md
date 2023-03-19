@@ -143,6 +143,10 @@ python -m pip install sqlalchemy==1.4.46
 python -m pip install pandas
 ```
 
+### 导入 Pear Admin Flask 初始化数据库
+
+将 ```pear.sql``` 文件导入搭建的 MySQL 数据库，并在 ```.flaskenv``` 文件中配置正确的数据库信息。
+
 ### 安装学校数据管理插件（Python Schoolmanager Pear）
 
 克隆此仓库的所有文件到 Pear Admin Flask 的 plugins/SchoolManager 文件夹下（需要手动创建 SchoolManager 文件夹），并在 ```.flaskenv``` 文件中做如下修改：
@@ -161,9 +165,6 @@ PLUGIN_ENABLE_FOLDERS = ["helloworld", "SchoolManager"]
 
 **注意：如果文件夹不是“SchoolManager”，则需要修改上述的名称为您创建的文件夹的名称。**
 
-#### 导入 Pear Admin Flask 初始化数据库
-
-将 ```pear.sql``` 文件导入搭建的 MySQL 数据库，并在 ```.flaskenv``` 文件中配置正确的数据库信息。
 
 ### 运行项目
 
