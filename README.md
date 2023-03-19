@@ -82,7 +82,9 @@ Pear Admin Flask 的搭建步骤详细可以参考其官方文档，这里进行
 
 #### 环境要求
 - Python >= 3.6
-- Mysql >= 5.7.0
+- MySQL >= 5.7.0
+
+在 Windows 下，对于 MySQL 的搭建，可以使用 [PHPStudy](https://www.xp.cn/) 小皮面板一键搭建 MySQL 环境。为了方便导入 Pear Admin Flask 的原始数据库数据，可以使用 [HeidiSQL](https://www.heidisql.com/download.php) 软件进行操作。
 
 #### 克隆远程仓库
 
