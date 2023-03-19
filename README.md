@@ -153,6 +153,14 @@ python -m pip install pandas
 
 克隆此仓库的所有文件到 Pear Admin Flask 的 plugins/SchoolManager 文件夹下（需要手动创建 SchoolManager 文件夹），并在 ```.flaskenv``` 文件中做如下修改：
 
+```shell
+# 进入项目插件目录
+cd plugins
+
+# 使用 git 克隆远程仓库
+git clone https://gitee.com/wojiaoyishang/python-schoolmanager-pear.git
+```
+
 ```
 # 插件配置
 PLUGIN_ENABLE_FOLDERS = ["helloworld"]
