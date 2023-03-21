@@ -406,6 +406,21 @@ layui.use(['table', 'form', 'jquery', 'layer', 'button', 'toast', 'dropdown'], f
         })
     });
 
+    // 查看证件照
+    $("#see_exam").click(function() {
+        if (form.val("student-info-form")['姓名'] == "") {
+            return;
+        }
+        layer.open({
+            type: 2,
+            title: '查看历次分析',
+            shade: 0.1,
+            area: ['100%', '100%'],
+            content: '/schoolmanager/examAnalyse/view/analyse?grade=' + form.val("student-info-form")['届数'] + "&name=" + form.val("student-info-form")['姓名'],
+            btn: ['确定']
+        })
+    });
+
     // 导入数据
     dropdown.render({
         elem: '#imp',
