@@ -7,7 +7,6 @@
   <h4 align="center">
     一 个 灵 活 的 学 校 数 据 管 理 项 目
   </h4> 
-
 </div>
 
 <div align="center">
