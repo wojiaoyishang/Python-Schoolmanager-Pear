@@ -5,9 +5,9 @@ bin-release/
 [Bb]in/
 
 # Other files and folders
-.settings/
-.data/
-.upload/
+settings/
+data/
+upload/
 
 # Executables
 *.swf
