@@ -8,6 +8,7 @@ bin-release/
 settings/
 data/*
 upload/*
+**/__pycache__
 
 # Executables
 *.swf
