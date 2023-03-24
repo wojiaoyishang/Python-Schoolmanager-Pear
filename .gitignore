@@ -6,8 +6,8 @@ bin-release/
 
 # Other files and folders
 settings/
-data/
-upload/
+data/*
+upload/*
 
 # Executables
 *.swf
