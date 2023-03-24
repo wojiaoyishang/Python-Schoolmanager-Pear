@@ -3,6 +3,7 @@ r"""
 C:\userfiles\pear admin flask\venv\Scripts\python.exe
 """
 import os
+import sqlite3
 
 from flask import Flask, Blueprint
 from .utils.tools import power, role
@@ -16,6 +17,77 @@ from .init_examAnalyse import blueprint as examAnalyse_blueprint
 # 获取插件所在的目录（结尾没有分割符号）
 dir_path = os.path.dirname(__file__).replace("\\", "/")
 folder_name = dir_path[dir_path.rfind("/") + 1:]  # 插件文件夹名称
+
+def create_database():
+    """
+    创建数据存储文件夹与数据库
+    """
+    # 上传文件夹
+    if not os.path.exists(dir_path + "/upload"):
+        os.mkdir(dir_path + "/upload")
+        
+    # 数据文件夹
+    if not os.path.exists(dir_path + "/data"):
+        os.mkdir(dir_path + "/data")
+        
+    # 照片文件夹
+    if not os.path.exists(dir_path + "/data/photos"):
+        os.mkdir(dir_path + "/data/photos")
+        
+    # 数据库初始化
+    if not os.path.exists(dir_path + "/data/examData.db"):
+        con = sqlite3.connect(dir_path + "/data/examData.db")
+        cur = con.cursor()
+        cur.execute("""CREATE TABLE "考试数据表" (
+                "index"	INTEGER NOT NULL,
+                "届数"	INTEGER,
+                "考试名称"	TEXT,
+                "考试时间"	INTEGER,
+                "考试备注"	TEXT,
+                "特控线分数"	REAL,
+                "语文总分"	REAL,
+                "数学总分"	REAL,
+                "外语总分"	REAL,
+                "政治总分"	REAL,
+                "历史总分"	REAL,
+                "地理总分"	REAL,
+                "物理总分"	REAL,
+                "化学总分"	REAL,
+                "生物总分"	REAL,
+                "技术总分"	REAL,
+                PRIMARY KEY("index" AUTOINCREMENT)
+            );""")
+        con.commit()
+        cur.close()
+        con.close()
+    
+    if not os.path.exists(dir_path + "/data/studentData.db"):
+        con = sqlite3.connect(dir_path + "/data/studentData.db")
+        cur = con.cursor()
+        cur.execute("""CREATE TABLE "时光邮局" (
+            "index"	INTEGER NOT NULL UNIQUE,
+            "FROM"	TEXT,
+            "TO"	TEXT,
+            "标题"	TEXT,
+            "内容"	TEXT,
+            "时间"	INTEGER,
+            PRIMARY KEY("index")
+        );""")
+        con.commit()
+        cur.close()
+        con.close()
+
+    if not os.path.exists(dir_path + "/data/systemData.db"):
+        con = sqlite3.connect(dir_path + "/data/systemData.db")
+        cur = con.cursor()
+        cur.execute("""CREATE TABLE "考试查询" (
+            "key"	TEXT NOT NULL UNIQUE,
+            "value"	TEXT,
+            PRIMARY KEY("key")
+        );""")
+        con.commit()
+        cur.close()
+        con.close()
 
 def register_power():
     """
@@ -71,6 +143,8 @@ def event_disable():
 
 def event_init(app: Flask):
     """初始化完成时会调用这里"""
+    # 检测数据文件夹是否存在
+    create_database()
     # 绑定到 admin.index 页面（后台管理页面）
     origin_function = app.view_functions['admin.index']  # 获取原视图函数
     def new_function():

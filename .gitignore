@@ -6,15 +6,17 @@ bin-release/
 
 # Other files and folders
 settings/
-data/*
-upload/*
-**/__pycache__
 
 # Executables
 *.swf
 *.air
 *.ipa
 *.apk
+
+# project
+**/__pycache__
+data/
+upload/
 *.db
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
