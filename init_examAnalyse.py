@@ -215,7 +215,7 @@ def view_api():
         
     question = student.get_setting(name, grade, "验证问题")
     anwser = student.get_setting(name, grade, "验证答案")
-    
+
     # 如果没有设置验证答案
     if anwser is None:
         idc = student_data['身份证号']

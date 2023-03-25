@@ -383,12 +383,18 @@ def get_setting(name, grade, key=None):
     data = cur.fetchone()
     
     if data is None or data[0] is None:
-        return {}
+        if key is None:
+            return {}
+        else:
+            return None
     
     data_json = json.loads(data[0])
     
     if data_json is None:
-        return {}
+        if key is None:
+            return {}
+        else:
+            return None
 
     if key is None:
         return data_json
