@@ -49,6 +49,9 @@ def setting_view():
     settings['标题'] = settings['标题'] if settings['标题'] not in (None, '') else "学校数据查询"
     settings['提示'] = settings['提示'] if settings['提示'] not in (None, '') else ""
     settings['公告'] = settings['公告'] if settings['公告'] not in (None, '') else ""
+    settings['openai_key'] = settings['openai_key'] if settings['openai_key'] not in (None, '') else ""
+    settings['openai_proxy'] = settings['openai_proxy'] if settings['openai_proxy'] not in (None, '') else ""
+    
     
     return render_template("schoolmanager_examPublish/setting.html", settings=settings)
 
