@@ -289,32 +289,41 @@ layui.use(['table', 'form', 'jquery', 'layer', 'button', 'toast', 'dropdown'], f
             formType: 0,
             value: '1',
             title: '新建班级（届数请在上方查询处更改）',
-          }, function(value, index, elem) { 
+        }, function(value, index, elem) { 
 
-            // 开始加载
-            let loader = layer.load();
-            let btn = button.load({elem: '.student-info-update'});
-
-            $.ajax({
-                url: '/schoolmanager/student/add',
-                data: {班级: value, 姓名: "新学生" + Date.now().toString(), 届数: form.val("student-query-form")['grade']},
-                type: 'post',
-                success: function(result) { 
-                    if (result.success) {
-                        layer.close(loader);
-                        btn.stop(function () {
-                            toast.success({title: '创建班级成功', message: result.msg, position: 'topCenter'});
-                            window.location.reload();
-                        })
-                    } else {
-                        layer.close(loader);
-                        btn.stop(function () {
-                            toast.error({title: '创建班级失败', message: result.msg, position: 'topCenter'});
-                        })
+            layer.prompt({
+                formType: 0,
+                value: '',
+                title: '输入新学生姓名（至少要有一位学生）',
+            }, function(name, index, elem) { 
+    
+                // 开始加载
+                let loader = layer.load();
+                let btn = button.load({elem: '.student-info-update'});
+    
+                $.ajax({
+                    url: '/schoolmanager/student/add',
+                    data: {班级: value, 姓名: name, 届数: form.val("student-query-form")['grade']},
+                    type: 'post',
+                    success: function(result) { 
+                        if (result.success) {
+                            layer.close(loader);
+                            btn.stop(function () {
+                                toast.success({title: '创建班级成功', message: result.msg, position: 'topCenter'});
+                                window.location.reload();
+                            })
+                        } else {
+                            layer.close(loader);
+                            btn.stop(function () {
+                                toast.error({title: '创建班级失败', message: result.msg, position: 'topCenter'});
+                            })
+                        }
                     }
-                }
+                })
             })
+            
         })
+
     });
 
     // 添加一个年段

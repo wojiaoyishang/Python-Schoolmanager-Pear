@@ -106,6 +106,11 @@ layui.use(['table', 'form', 'jquery', 'layer', 'button', 'toast', 'dropdown'], f
 
         data.field['startDate'] = new Date(data.field['startDate']).getTime()
         data.field['endDate'] = new Date(data.field['endDate']).getTime()
+        
+        if (isNaN(data.field['startDate']) || isNaN(data.field['endDate'])) {
+            data.field['startDate'] = null
+            data.field['endDate'] = null
+        }
 
         // 数据重载
         table.reload('data-table', {

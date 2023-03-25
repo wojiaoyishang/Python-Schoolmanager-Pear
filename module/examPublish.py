@@ -164,27 +164,27 @@ def get_all_exam(fields="考试名称", index=None, grade=None, name=None, start
     
     sql_from = ""
     
-    if grade not in (None, ""):
+    if grade is not None:
         sql_from += f"WHERE 届数 = {grade}"
     
-    if index not in (None, ""):
+    if index is not None:
         if sql_from.find("WHERE") != -1:
             sql_from += f""" AND "index" = {int(index)} """
         else:
             sql_from += f""" WHERE "index" = {int(index)} """
     
-    if name not in (None, ""):
+    if name is not None:
         if sql_from.find("WHERE") != -1:
             sql_from += f""" AND 考试名称 REGEXP "{name}" """
         else:
             sql_from += f""" WHERE 考试名称 REGEXP "{name}" """
     
-    if startDate not in (None, "") or endDate not in (None, ""):
+    if startDate is not None or endDate is not None:
         if sql_from.find("WHERE") != -1:
             sql_from += f""" AND 考试时间 BETWEEN {startDate} AND {endDate} """
         else:
             sql_from += f""" WHERE 考试时间 BETWEEN {startDate} AND {endDate} """
-
+    
     if page is None or limit is None:
         cur.execute(f""" SELECT {fields} FROM "考试数据表" {sql_from} ORDER BY 考试时间""")
     else:
@@ -466,6 +466,7 @@ def update_exam_data(index, data):
     cur = examData_con.cursor()
     
     # 获取考试信息
+
     cur.execute(f""" SELECT 考试名称, 届数 FROM "考试数据表" WHERE "index" = ? """, (index,))
     exam_name, grade = cur.fetchone()
     

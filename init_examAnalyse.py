@@ -7,7 +7,7 @@ from applications.common.utils.validate import str_escape
 
 from flask import Blueprint, render_template, request, send_file, session
 
-from .utils import imp_get_dataframe
+from .utils import imp_get_dataframe, get_args_safely, student_permissions
 from .module import examPublish, student, examAnalyse, setting
 
 # 获取插件所在的目录（结尾没有分割符号）
@@ -33,16 +33,15 @@ def exam_average_api():
     获取平均分
     """
     form = request.args.copy()
+    success, msg = get_args_safely(form, must_have=['index', 'giveMark'])
+    if not success:
+        return fail_api(msg)
     
-    index = form.get('index', '-1')
-    giveMark = form.get('giveMark', '-1')
+    index = form.get('index')
+    giveMark = form.get('giveMark')
     
-    
-    if not index.isdigit():
-        return fail_api(msg="考试ID错误！")
-    
-    if not giveMark.isdigit():
-        return fail_api(msg="是否赋分错误！")
+    if index is None or giveMark is None:
+        return fail_api(msg="缺少参数！")
     
     return examAnalyse.get_average(index, giveMark)
 
@@ -53,15 +52,15 @@ def exam_specMarkStudent_api():
     获取特控线人数
     """
     form = request.args.copy()
+    success, msg = get_args_safely(form, must_have=['grade', 'giveMark'])
+    if not success:
+        return fail_api(msg)
     
-    grade = form.get('grade', '-1')
-    giveMark = form.get('giveMark', '-1')
+    grade = form.get('grade')
+    giveMark = form.get('giveMark')
     
-    if not grade.isdigit():
-        return fail_api(msg="年级错误！")
-    
-    if not giveMark.isdigit():
-        return fail_api(msg="是否赋分错误！")
+    if grade is None or giveMark is None:
+        return fail_api(msg="缺少参数！")
     
     # 获取所有考试数据
     exams = examPublish.get_all_exam("`index`, 考试名称", grade=grade)['data']
@@ -82,15 +81,15 @@ def exam_specMarkStudent_by_class_api():
     获取特控线人数
     """
     form = request.args.copy()
+    success, msg = get_args_safely(form, must_have=['grade', 'giveMark'])
+    if not success:
+        return fail_api(msg)
     
-    grade = form.get('grade', '-1')
-    giveMark = form.get('giveMark', '-1')
+    grade = form.get('grade')
+    giveMark = form.get('giveMark')
     
-    if not grade.isdigit():
-        return fail_api(msg="年级错误！")
-    
-    if not giveMark.isdigit():
-        return fail_api(msg="是否赋分错误！")
+    if grade is None or giveMark is None:
+        return fail_api(msg="缺少参数！")
     
     # 获取所有考试数据
     exams = examPublish.get_all_exam("`index`, 考试名称", grade=grade)['data']
@@ -142,19 +141,16 @@ def countStudent_api():
     获取分数段前人数
     """
     form = request.args.copy()
+    success, msg = get_args_safely(form, must_have=['rank', 'index', 'giveMark'])
+    if not success:
+        return fail_api(msg)
     
-    index = form.get('index', '-1')
-    rank = form.get('rank', '-1')
-    giveMark = form.get('giveMark', '-1')
+    index = form.get('index')
+    rank = form.get('rank')
+    giveMark = form.get('giveMark')
     
-    if not index.isdigit():
-        return fail_api(msg="年级错误！")
-    
-    if not rank.isdigit():
-        return fail_api(msg="年级错误！")
-    
-    if not giveMark.isdigit():
-        return fail_api(msg="是否赋分错误！")
+    if index is None or rank is None or giveMark is None:
+        return fail_api(msg="缺少参数！")
     
     return examAnalyse.get_countStudent(index, giveMark, rank)
 
@@ -167,7 +163,6 @@ def view_index():
     前台成绩查询页面
     """
     grades = student.get_grades()  # 所有届数
-    
     
     settings = {
         "标题": setting.get("考试查询", "标题"),
@@ -187,19 +182,20 @@ def view_api():
     前台成绩查询
     """
     form = request.form.copy()
+    success, msg = get_args_safely(form, must_have=['name', 'grade', 'user_answer'])
+    if not success:
+        return fail_api(msg)
     
     name = str_escape(form.get("name"))
     grade = str_escape(form.get("grade"))
     user_answer = str_escape(form.get("answer"))
     code = form.get('captcha').__str__().lower()
     
-    if name in (None, ''):
+    if name is None:
         return fail_api(msg="姓名未提供！")
     
     if grade is None:
-        return fail_api(msg="届数未提供！")
-    elif not grade.isdigit():
-        return fail_api(msg="届数错误！")
+        return fail_api(msg="届数未提供或错误！")
     
     s_code = session.get("code", None)
     
@@ -252,13 +248,18 @@ def view_analyse():
     """
     成绩分析
     """
-    name = request.args.get('name')
-    grade = request.args.get('grade', "-1")
+    args = request.args.copy()
+    success, msg = get_args_safely(args, must_have=['name', 'grade'])
+    if not success:
+        return fail_api(msg)
     
-    if not grade.isdigit() or name is None:
+    grade = args.get('grade')
+    name = args.get('name')
+    
+    if grade is None or name is None:
         return fail_api(msg="没有提供正确的参数。")
     
-    if 'SchoolManager:student' in session.get('permissions', []) or (session.get("schoolmanager_name") == name and session.get("schoolmanager_grade") == grade):
+    if student_permissions("SchoolManager:student", name, grade):
         return render_template("schoolmanager_examAnalyse/view_analyse.html")
     else:
         return "<script>window.location.href = '/schoolmanager/examAnalyse/view'</script>"

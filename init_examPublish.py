@@ -8,7 +8,7 @@ from applications.common.utils.validate import str_escape
 
 from flask import Blueprint, render_template, request, session
 
-from .utils import imp_get_dataframe
+from .utils import imp_get_dataframe, get_args_safely, student_permissions
 from .module import examPublish, student, setting
 
 # 获取插件所在的目录（结尾没有分割符号）
@@ -56,19 +56,23 @@ def setting_api():
     """
     设置页面api
     """
-    form = request.form.copy()
+    # 获取参数
+    req = request.form.copy()
+    success, msg = get_args_safely(req, must_have=["标题", "公告", "提示"])
+    if not success:
+        return fail_api(msg)
     
-    form["标题"] = form.get("标题")
-    
-    if form["标题"] is None:
-        form["标题"] = "学校数据查询"
-    elif form["标题"].strip() == "":
-        form["标题"] = "学校数据查询"
+    # 参数处理
+    req["标题"] = req.get("标题")
+    if req["标题"] is None:
+        req["标题"] = "学校数据查询"
+    elif req["标题"].strip() == "":
+        req["标题"] = "学校数据查询"
     
     try:
-        setting.set("考试查询", "标题", form.get("标题"))
-        setting.set("考试查询", "公告", form.get("公告"))
-        setting.set("考试查询", "提示", form.get("提示"))
+        setting.set("考试查询", "标题", req.get("标题"))
+        setting.set("考试查询", "公告", req.get("公告"))
+        setting.set("考试查询", "提示", req.get("提示"))
     except BaseException as e:
         return fail_api(msg="设置失败！" + str(e))
         
@@ -94,12 +98,14 @@ def info_view():
     """
     考试数据编辑查看页面
     """
-    form = request.args.copy()
-
-    info = examPublish.get_all_exam(fields="*", index=form.get('index'))['data'][0]
+    # 获取参数
+    req = request.args.copy()
+    success, msg = get_args_safely(req, must_have=["index"])
+    if not success:
+        return fail_api(msg)
     
+    info = examPublish.get_all_exam(fields="*", index=req.get('index'))['data'][0]
     grades = student.get_grades()  # 所有届数
-    
     classes = student.get_all_class(info['届数'])
     
     return render_template("schoolmanager_examPublish/info.html", grades=grades, info=info, classes=classes)
@@ -110,14 +116,14 @@ def imp():
     """
     考试数据导入接口
     """
+    # 获取参数
     # 这里会传入 args 、 imp 数据 与 ext 数据
     data = request.get_json()
+    success, msg = get_args_safely(data, must_have=["args", "ext", "imp"])
+    if not success:
+        return fail_api(msg)
     
-    if  data is None:
-        return fail_api("不正确的参数！")
-    
-    if not ('args' in data and 'ext' in data and 'imp' in data):
-        return fail_api("不正确的参数！")
+    # 参数处理
     
     # 删除掉不允许的字段
     allow_field = ["姓名", "语文", "数学", "外语", "政治", "历史", "地理", "物理", "化学", "生物", "技术", "备注"]
@@ -147,24 +153,19 @@ def data():
     """
     表格数据
     """
-    page = int(request.form.get('page', 0))
-    limit = int(request.form.get('limit', 10))
+    # 获取参数
+    req = request.form.copy()
+    success, msg = get_args_safely(req, must_have=["limit", "page", "grade", "startDate", "endDate"])
+    if not success:
+        return fail_api(msg)
+
+    page = req.get('page', 0)
+    limit = req.get('limit', 10)
     
-    grade = request.form.get('grade', '')
-    name = str_escape(request.form.get('name'))
-    startDate = request.form.get('startDate', '')
-    endDate = request.form.get('endDate', '')
-    
-    
-    # 判断提供参数正确
-    if not grade.isdigit() or grade == '':
-        grade = None
-    
-    if not startDate.isdigit() or startDate == '':
-        startDate = None
-    
-    if not endDate.isdigit() or endDate == '':
-        endDate = None
+    grade = req.get('grade')
+    name = str_escape(req.get('name'))
+    startDate = req.get('startDate')
+    endDate = req.get('endDate')
     
     try:
         return table_api(msg="success", **examPublish.get_all_exam(fields="*", grade=grade, page=page, limit=limit, 
@@ -179,17 +180,13 @@ def delete():
     """
     删除考试数据
     """
-    form = request.form.copy()
-    
-    # 处理数据
-    if not form.get("grade", "-1").isdigit():
-        return fail_api("届数错误。")
-    
-    if form.get("name", "").strip() == "":
-        return fail_api("姓名未提供。")
+    req = request.form.copy()
+    success, msg = get_args_safely(req, must_have=["grade", "name"])
+    if not success:
+        return fail_api(msg)
     
     try:
-        examPublish.delete_exam(**form)
+        examPublish.delete_exam(**req)
         return success_api("数据删除成功。")
     except BaseException as e:
         traceback.print_exc()
@@ -201,16 +198,17 @@ def add():
     """
     添加考试数据
     """
-    form = request.form.copy()
+    req = request.form.copy()
+    success, msg = get_args_safely(req, must_have=["grade", "name"])
+    if not success:
+        return fail_api(msg)
 
     # 处理数据
-    if not form.get("grade", "-1").isdigit():          
-        return fail_api("届数错误。")
-    if int(form.get("grade", "-1")) not in student.get_grades():
-            return fail_api("届数不存在。")   
+    if req.get("grade") not in student.get_grades():
+        return fail_api("届数不存在。")   
     
     try:
-        success, msg = examPublish.add_exam(**form)
+        success, msg = examPublish.add_exam(**req)
     except BaseException as e:
         traceback.print_exc()
         return fail_api(msg="创建失败！" + str(e))
@@ -226,17 +224,17 @@ def update():
     """
     更新考试信息
     """
-    form = request.form.copy()
+    req = request.form.copy()
+    success, msg = get_args_safely(req, must_have=["届数"])
+    if not success:
+        return fail_api(msg)
 
-    
     # 处理数据
-    if not form.get("届数", "-1").isdigit():    
-        return fail_api("届数错误。")
-    if int(form.get("届数", "-1")) not in student.get_grades():
-            return fail_api("届数不存在。")   
+    if req.get("届数") not in student.get_grades():
+        return fail_api("届数不存在。")   
 
     try:
-        success, msg = examPublish.set_exam_info(**form)
+        success, msg = examPublish.set_exam_info(**req)
     except BaseException as e:
         traceback.print_exc()
         return fail_api(msg="创建失败！" + str(e))
@@ -254,24 +252,20 @@ def exam_data():
     获取成绩信息
     """
     form = request.form.copy()
+    success, msg = get_args_safely(form, must_have=["limit", "page", "class", "index", "名称"])
+    if not success:
+        return fail_api(msg)
 
     # 处理数据
-    if not form.get("index", "-1").isdigit():    
-        return fail_api("考试ID错误。") 
 
-    limit = int(form.get("limit"))
-    page = int(form.get("page"))
+    limit = form.get("limit")
+    page = form.get("page")
     
-    
-    index = int(form.get("index"))
+    index = form.get("index")
     class_ = form.get("class")
-    if class_ in (None, ""):
-        class_ = None
 
     name = str_escape(form.get("name"))
-    if name in (None, ''):
-        name = None
-        
+    
     # 查询设置
     setting = form.get("setting", '').split(",")
     
@@ -297,19 +291,18 @@ def exam_update():
     更新一条成绩信息
     """
     form = request.get_json()
+    success, msg = get_args_safely(form, must_have=["index", 'data'])
+    if not success:
+        return fail_api(msg)
     
-    if  data is None:
-        return fail_api("不正确的参数！")
-    
-     
-    try:
-        index = int(form.get("index"))
-    except BaseException as e:
-        return fail_api("考试ID错误。") 
-        
-    if 'data' not in form:
+    if form['data'] is None:
         return fail_api(msg="参数错误！")
 
+    index = form.get('index')
+    
+    if index is None:
+        return fail_api(msg="没有提供正确的参数。")
+    
     # 处理允许的字段
     fields = ['姓名', '赋分', '语文', '数学', '外语', '政治', '历史', '地理', '物理', '化学', '生物', '技术', '备注']
     
@@ -318,11 +311,12 @@ def exam_update():
             del form['data'][f]
     
     form['data']['赋分'] = 1 if form['data']['赋分'] == "是" else 0
-    
+
     try:
         examPublish.update_exam_data(index=index, data=form['data'])
         return success_api(msg="成功数据成功！")
     except BaseException as e:
+        traceback.print_exc()
         return fail_api(msg="出现错误！" + str(e))
 
 
@@ -333,18 +327,17 @@ def exam_delete():
     删除一条成绩信息
     """
     form = request.get_json()
+    success, msg = get_args_safely(form, must_have=["index", 'data'])
+    if not success:
+        return fail_api(msg)
     
-    if  data is None:
-        return fail_api("不正确的参数！")
-    
-     
-    try:
-        index = int(form.get("index"))
-    except BaseException as e:
-        return fail_api("考试ID错误。") 
-        
-    if 'data' not in form:
+    if form['data'] is None:
         return fail_api(msg="参数错误！")
+     
+    index = form.get('index')
+    
+    if index is None:
+        return fail_api(msg="没有提供正确的参数。")
     
     form['data']['赋分'] = 1 if form['data']['赋分'] == "是" else 0
     
@@ -359,16 +352,20 @@ def studentExams():
     """
     表格数据
     """
-    grade = request.form.get('grade', '')
-    name = str_escape(request.form.get('name'))
-    giveMark = request.form.get('giveMark', '1') == '1'
+    form = request.form.copy()
+    success, msg = get_args_safely(form, must_have=["grade", "name", "giveMark"])
+    if not success:
+        return fail_api(msg)
     
-    # 判断提供参数正确
-    if not grade.isdigit() or grade == '':
-        grade = None
+    grade = form.get('grade')
+    name = str_escape(form.get('name'))
+    giveMark = form.get('giveMark')
+    
+    if grade is None or name is None or giveMark is None:
+        return fail_api(msg="没有提供正确的参数。")
 
     try:
-        if ("SchoolManager:examPublish" in session.get('permissions', [])) or (session.get("schoolmanager_name") == name and session.get("schoolmanager_grade") == grade):
+        if student_permissions("SchoolManager:examPublish", name, grade):
             # 获取所有考试
             exams = examPublish.get_all_exam(fields="`index`, 考试名称", grade=grade, page=None, limit=None)['data']
             data = []

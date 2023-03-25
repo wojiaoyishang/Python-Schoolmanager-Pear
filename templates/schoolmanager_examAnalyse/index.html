@@ -179,7 +179,6 @@ function 各班特控线人数统计(grade, giveMark) {
         data: {grade: grade, giveMark: giveMark},
         type: 'get',
         success: function (result) {
-            debugger
             let xData = result.examName;
             // 提取所有键作为图例数据并按从小到大排序，然后在每个值后面加上 "班" 字
             let legendData = [...new Set(result.examCount.flatMap(item => Object.keys(item)))].sort((a, b) => a - b).map(key => key + '班');

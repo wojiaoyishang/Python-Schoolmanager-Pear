@@ -406,6 +406,10 @@ function drawChart() {
     dataZoom:{show:true,realtime:true,start : 0,end : 100}
     };
 
+    window.addEventListener("resize",function() {
+        echartsRecords.resize();
+    });
+
     // 定义排名名称数组
     var rankNames = ['总分排名', '语文排名', '数学排名', '外语排名', "政治排名", "历史排名", "地理排名", "物理排名", "化学排名", "生物排名", "技术排名", "主科排名", "副科排名"];
 
