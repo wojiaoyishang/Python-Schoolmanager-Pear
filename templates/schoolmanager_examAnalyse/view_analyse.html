@@ -567,10 +567,11 @@ function getExams(giveMark) {
             layui.$(".layui-table-view[lay-id='data-table'] .layui-table-body tr[data-index=0] .layui-form-radio").click();
             drawChart();
             setTips();
+            chatGPT_words(giveMark ? "1" : "0");
         }
     })
 
-    chatGPT_words(giveMark ? "1" : "0")
+   
 }
 
 
