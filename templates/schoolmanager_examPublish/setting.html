@@ -20,7 +20,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">标题设置</label>
             <div class="layui-input-block">
-                <input type="text" name="标题"  placeholder="默认标题为“学校数据查询”" value={{ settings['标题'] }} autocomplete="off" class="layui-input">
+                <input type="text" name="标题"  placeholder="默认标题为“学校数据查询”" value="{{ settings['标题'] }}" autocomplete="off" class="layui-input">
             </div>
         </div>
 
@@ -38,8 +38,20 @@
             </div>
         </div>
 
+        <div class="layui-form-item">
+            <label class="layui-form-label">openai key</label>
+            <div class="layui-input-block">
+                <input name="openai_key" placeholder="若留空默认则不使用chatGPT" class="layui-input" value="{{ settings['openai_key'] }}">
+            </div>
+        </div>
         
-        
+        <div class="layui-form-item">
+            <label class="layui-form-label">openai 代理</label>
+            <div class="layui-input-block">
+                <input name="openai_proxy" placeholder="若留空默认则不代理，格式为 http://ip:port " class="layui-input" value="{{ settings['openai_proxy'] }}">
+            </div>
+        </div>
+
     </form>
 
 </body>

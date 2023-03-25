@@ -382,13 +382,21 @@ def get_setting(name, grade, key=None):
     cur.execute(f""" SELECT 查询设置 FROM "{grade}届学生数据" WHERE 姓名 = ? """, (name,))
     data = cur.fetchone()
     
-    if data[0] in (None, ''):
-        return None
+    if data is None or data[0] is None:
+        return {}
+    
+    data_json = json.loads(data[0])
+    
+    if data_json is None:
+        return {}
 
     if key is None:
-        return json.loads(data[0])
+        return data_json
     
-    return json.loads(data[0])[key]
+    if key not in data_json:
+        return None
+    
+    return data_json[key]
 
 
 def set_setting(name, grade, key, value):

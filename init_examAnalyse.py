@@ -1,11 +1,13 @@
 import os
 import json
+import time
+import requests
 
 from applications.common.utils.http import table_api, success_api, fail_api
 from applications.common.utils.rights import authorize
 from applications.common.utils.validate import str_escape
 
-from flask import Blueprint, render_template, request, send_file, session
+from flask import Blueprint, render_template, request, send_file, session, Response
 
 from .utils import imp_get_dataframe, get_args_safely, student_permissions
 from .module import examPublish, student, examAnalyse, setting
@@ -263,3 +265,105 @@ def view_analyse():
         return render_template("schoolmanager_examAnalyse/view_analyse.html")
     else:
         return "<script>window.location.href = '/schoolmanager/examAnalyse/view'</script>"
+
+@blueprint.get("/view/chatGPTWords_stream")
+def view_chatGPTWords_stream():
+    """
+    AI 激励
+    """
+    # 获取参数
+    args = request.args.copy()
+    success, msg = get_args_safely(args, must_have=['name', 'grade', 'giveMark'])
+    if not success:
+        return fail_api(msg)
+    
+    grade = args.get('grade')
+    name = args.get('name')
+    giveMark = args.get('giveMark')
+    
+    if grade is None or name is None or giveMark is None:
+        return fail_api(msg="没有提供正确的参数。")
+    
+    # 查看一下是否已经生成
+    student_setting = student.get_setting(name, grade, None)
+    chatGPT_words = student_setting.get("chatGPT_words_" + str(giveMark))
+    chatGPT_count = student_setting.get("chatGPT_count_" + str(giveMark))  # 生成时候的考试数量
+    
+    all_exam_data = examPublish.get_all_exam("`index`", grade=grade)['data']
+    
+    if chatGPT_count == len(all_exam_data):  # 现在的考试数量
+        def generate():
+            for chunk in chatGPT_words:  
+                time.sleep(0.05)
+                yield chunk
+        return Response(generate(), mimetype='text/event-stream')
+
+    
+    # 生成考试分析，将历次排名与参加考试人数找出来
+    ranks = []
+    totals = []
+    for d in all_exam_data:
+        index = d['index']
+        _ = examPublish.get_exam(index=index, name=name, giveMark=giveMark)
+        exam_data = _['data']
+        _ = examPublish.get_exam(index=index, giveMark=giveMark)
+        count = _['count']
+        if len(exam_data) == 0:
+            continue
+        ranks.append(exam_data[0]['总分排名'])
+        totals.append(count)
+    
+    # 连接 chatGPT
+    prompt = """你是用户的朋友，也是一个成绩分析AI，你需要帮助分析用户的历次排名成绩， 要求：""" + \
+        """使用中文聊天，多使用名言或者诗歌来鼓励用户，请不要说诸如“你参加了这次考试”的话，""" + \
+        """排名(ranks)越小越好，同时用户还会提供所有参加考试的人数(totals)，你需要结合并给出建议。""" + \
+        """大概300字，请尽可能鼓励用户。"""
+    
+    api_key = setting.get("考试查询", "openai_key")
+    proxy = setting.get("考试查询", "openai_proxy")
+    
+    if api_key is None or api_key == "":
+        return "很抱歉 chatGPT 还未被唤醒！请加油！我们一直都在！"
+    
+    data = {}
+    data['model'] = "gpt-3.5-turbo-0301"
+    data['stream'] = True
+    data['max_tokens'] = 500
+    data['messages'] = []
+    data['messages'].append({"role": "system", "content": prompt})
+    data['messages'].append({"role": "user", "content": "ranks=" + str(ranks) + \
+                        "totals=" + str(totals)})
+
+    data = json.dumps(data)
+    
+    result = requests.post("https://api.openai.com/v1/chat/completions", 
+                  headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + api_key},
+                  data=data, proxies={'http': proxy, 'https': proxy}, stream=True)
+    
+    def generate():
+        """还没有生成的生成"""
+        content = b""
+        full_content = ""
+        for chunk in result.iter_content(chunk_size=1):  
+            if chunk:
+                content += chunk
+                if chunk == b"\n":
+                    if not (content.decode() == "data: [DONE]\n" or content.decode() == '\n'):
+                        try:
+                            json_data = json.loads(content.decode().strip("data: ").strip("\n"))
+                        except:
+                            return f"很抱歉 chatGPT 还未被唤醒！请加油！我们一直都在！"
+                        try:
+                            if 'content' in json_data['choices'][0]['delta']:
+                                full_content += json_data['choices'][0]['delta']['content']
+                                yield json_data['choices'][0]['delta']['content']
+                        except BaseException as error:
+                            return f"很抱歉 chatGPT 还未被唤醒！请加油！我们一直都在！（错误代码：{str(error)}）"
+                            
+                    elif content.decode() == "data: [DONE]\n":
+                        student.set_setting(name, grade, "chatGPT_words_" + str(giveMark), full_content)
+                        student.set_setting(name, grade, "chatGPT_count_" + str(giveMark), len(all_exam_data))
+                        print("已使用chatGPT生成：", student.get_setting(name, grade, None))
+                    content = b""
+
+    return Response(generate(), mimetype='text/event-stream')

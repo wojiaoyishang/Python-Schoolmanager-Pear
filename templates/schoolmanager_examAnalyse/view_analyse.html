@@ -12,6 +12,17 @@
         .list .list-item {
             color: black !important;
         }
+        
+        #chatGPT_words:after {
+            content: "|";
+            animation: blink .75s step-end infinite;
+            font-size: 20px;
+        }
+          
+        @keyframes blink {
+            from, to { color: transparent }
+            50% { color: black }
+        }
     </style>
 </head>
 
@@ -223,6 +234,16 @@
                         </form>
                     </div>
                 </div>
+
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        chatGPT 对你说
+                    </div>
+                    <div class="layui-card-body">
+                        <div id="chatGPT_words">正在等待回信......</div>
+                    </div>
+                </div>
+
             </div>
             <div class="layui-col-md9">
                 <div class="layui-card">
@@ -283,6 +304,8 @@ var student_grade = getQueryString('grade')
 
 var student_info = null
 var student_exam = null
+
+var chatGPT_controller = new AbortController();
 
 // 详细身份信息
 function more_identity_info() {
@@ -546,6 +569,8 @@ function getExams(giveMark) {
             setTips();
         }
     })
+
+    chatGPT_words(giveMark ? "1" : "0")
 }
 
 
@@ -624,6 +649,40 @@ function setTips() {
     document.querySelector("#value4").textContent = lowestMinorSubject
 }
 
+// 获取 chatGPT_words
+function chatGPT_words(giveMark) {
+    
+    chatGPT_controller.abort();
+    chatGPT_controller = new AbortController();
+
+    document.getElementById("chatGPT_words").innerHTML = ""
+    async function readStream(stream) {
+        const reader = stream.getReader();
+        const decoder = new TextDecoder();
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              break;
+            }
+            let string = decoder.decode(value);
+            document.getElementById("chatGPT_words").innerHTML += string;
+          }
+        } finally {
+          reader.releaseLock();
+        }
+    }
+    
+    const chatGPT_signal = chatGPT_controller.signal;
+
+    fetch(`/schoolmanager/examAnalyse/view/chatGPTWords_stream?name=${student_name}&grade=${student_grade}&giveMark=${giveMark}`, { signal: chatGPT_signal })
+    .then(response => {
+        const stream = response.body;
+        readStream(stream, chatGPT_signal);
+    });
+
+}
+
 layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 'table', 'laytpl', 'count'], function () {
     var $ = layui.jquery,
         echarts = layui.echarts,
@@ -635,15 +694,7 @@ layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 
         toast = layui.toast,
         count = layui.count;
 
-    // 开始加载
-    //loading.Load(2, "等待服务器处理信息......");
 
-    // 加载完毕
-    //loading.loadRemove();
-
-
-
-    
    // 获取个人信息
    getPersonInfo();
    getExams(true);
@@ -651,7 +702,7 @@ layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 
    // 绑定事件
    form.on('checkbox(giveMark)', function(data){
         getExams(data.elem.checked)
-    });
+   });
 
     // 设置验证问题
     form.on('submit(setting_submit)', function(data){

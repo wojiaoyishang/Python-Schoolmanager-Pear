@@ -41,7 +41,9 @@ def setting_view():
     settings = {
         "标题": setting.get("考试查询", "标题"),
         "提示": setting.get("考试查询", "提示"),
-        "公告": setting.get("考试查询", "公告")
+        "公告": setting.get("考试查询", "公告"),
+        'openai_key': setting.get("考试查询", "openai_key"),
+        'openai_proxy': setting.get("考试查询", "openai_proxy")
     }
     
     settings['标题'] = settings['标题'] if settings['标题'] not in (None, '') else "学校数据查询"
@@ -73,6 +75,8 @@ def setting_api():
         setting.set("考试查询", "标题", req.get("标题"))
         setting.set("考试查询", "公告", req.get("公告"))
         setting.set("考试查询", "提示", req.get("提示"))
+        setting.set("考试查询", "openai_key", req.get("openai_key"))
+        setting.set("考试查询", "openai_proxy", req.get("openai_proxy"))
     except BaseException as e:
         return fail_api(msg="设置失败！" + str(e))
         

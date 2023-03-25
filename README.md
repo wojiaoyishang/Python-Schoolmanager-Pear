@@ -72,8 +72,7 @@
 - 2023.3.24 修复BUG：前台查询页面图标自动重设大小
 - 2023.3.24 更新功能：创建新班级时可以自定义占位学生名
 - 2023.3.25 更新功能：重写权限判断
-
-
+- 2023.3.25 更新功能：加入“chatGPT对你说”功能，使用 AI 分析成绩并给出建议。
 
 ## 安装教程
 
@@ -148,6 +147,7 @@ python -m pip install sqlalchemy==1.4.46
 
 # 安装 此项目依赖
 python -m pip install pandas
+python -m pip install requests
 ```
 
 ### 导入 Pear Admin Flask 初始化数据库
