@@ -13,6 +13,8 @@
   <img  width="92%" style="border-radius:10px;margin-top:20px;margin-bottom:20px;box-shadow: 2px 0 6px gray;" src="https://gitee.com/wojiaoyishang/python-schoolmanager-pear/raw/master/images/image9.png" />
 </div>
 
+**由于主项目Pear Admin Flask 的修改，配置部分可能有所变化，请等待我更新**
+
 ## 项目介绍与设计理念
 
 这是一个基于 Python Flask 的学校数据管理插件，后台界面采用开源项目 Pear Admin Flask，并且以插件的形式接入 Pear Admin Flask。
