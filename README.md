@@ -13,7 +13,7 @@
   <img  width="92%" style="border-radius:10px;margin-top:20px;margin-bottom:20px;box-shadow: 2px 0 6px gray;" src="https://gitee.com/wojiaoyishang/python-schoolmanager-pear/raw/master/images/image9.png" />
 </div>
 
-**由于主项目Pear Admin Flask 的修改，配置部分可能有所变化，请等待我更新**
+> **由于主项目Pear Admin Flask 的修改，配置部分可能有所变化，现在已经更新**
 
 ## 项目介绍与设计理念
 
@@ -88,7 +88,7 @@ Pear Admin Flask 的搭建步骤详细可以参考其官方文档，这里进行
 
 #### 环境要求
 - Python >= 3.6
-- MySQL >= 5.7.0
+- MySQL >= 5.7.0 (非必要，可以使用 SQLite3 作为数据库)
 
 _在 Windows 下，对于 MySQL 的搭建，可以使用 [PHPStudy](https://www.xp.cn/) 小皮面板一键搭建 MySQL 环境。为了方便导入 Pear Admin Flask 的原始数据库数据，可以使用 [HeidiSQL](https://www.heidisql.com/download.php) 软件进行操作。_
 
@@ -131,9 +131,6 @@ venv\Scripts\activate
 # 使用 pip 安装必要模块（对于 master 分支）
 pip install -r requirement\dev.txt
 
-# 安装原 pear admin flask 的缺少库
-pip install sqlalchemy==1.4.46
-
 # 安装 此项目依赖
 pip install pandas
 ```
@@ -144,9 +141,6 @@ pip install pandas
 # 使用 pip 安装必要模块（对于 master 分支）
 python -m pip install -r requirement\requirement.txt
 
-# 安装原 pear admin flask 的缺少库
-python -m pip install sqlalchemy==1.4.46
-
 # 安装 此项目依赖
 python -m pip install pandas
 python -m pip install requests
@@ -154,7 +148,67 @@ python -m pip install requests
 
 ### 导入 Pear Admin Flask 初始化数据库
 
-将 ```pear.sql``` 文件导入搭建的 MySQL 数据库，并在 ```.flaskenv``` 文件中配置正确的数据库信息。
+#### 配置数据库
+
++ 使用 SQLite3 作为数据库（不需要搭建 SQL 环境）
+
+打开文件 `applications/config.py` 并修改如下行：
+
+```python
+# mysql 数据库的配置信息
+SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USERNAME}:{urlquote(MYSQL_PASSWORD)}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}?charset=utf8mb4"
+
+# 改为
+SQLALCHEMY_DATABASE_URI = "sqlite:///database.db"
+
+# 如果需要，可以同时更改 APSCHEDULER 的参数（本项目用不到，如果对于 Pear Admin Flask 完整功能则是必须的）
+SCHEDULER_JOBSTORES: dict = {
+        'default': SQLAlchemyJobStore(
+            url=f'mysql+pymysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}')
+}
+
+# 改为
+SCHEDULER_JOBSTORES: dict = {
+        'default': SQLAlchemyJobStore(
+            url="sqlite:///database.db")
+}
+```
+
++ 使用 mySQL 数据库
+
+请按照配置修改变量：
+
+```python
+# mysql 配置
+MYSQL_USERNAME = "root"
+MYSQL_PASSWORD = "123456"
+MYSQL_HOST = "127.0.0.1"
+MYSQL_PORT = 3306
+MYSQL_DATABASE = "PearAdminFlask"
+```
+
+#### 导入数据库
+
+```
+# 初始化数据库
+flask db init
+flask db migrate
+flask db upgrade
+flask admin init
+```
+
+依次执行后会显示：
+
+```
+加载系统必须用户数据
+加载系统必须角色数据
+加载系统必须部门数据
+加载系统必须权限数据
+基础数据存入
+用户角色数据存入
+角色权限数据存入
+数据初始化完成,请使用python app.py命令运行
+```
 
 ### 安装学校数据管理插件（Python Schoolmanager Pear）
 
@@ -168,18 +222,18 @@ cd plugins
 git clone https://gitee.com/wojiaoyishang/python-schoolmanager-pear.git
 ```
 
-并在 ```.flaskenv``` 文件中做如下修改：
+并在 ```applications/config.py``` 文件中做如下修改：
 
 ```
 # 插件配置
-PLUGIN_ENABLE_FOLDERS = ["helloworld"]
+PLUGIN_ENABLE_FOLDERS = []
 ```
 
 添加（或替换上）```SchoolManager```，如：
 
 ```
 # 插件配置
-PLUGIN_ENABLE_FOLDERS = ["helloworld", "SchoolManager"]
+PLUGIN_ENABLE_FOLDERS = ["SchoolManager"]
 ```
 
 **注意：如果文件夹不是“SchoolManager”，则需要修改上述的名称为您创建的文件夹的名称。**
