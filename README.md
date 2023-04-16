@@ -13,6 +13,7 @@
   <img  width="92%" style="border-radius:10px;margin-top:20px;margin-bottom:20px;box-shadow: 2px 0 6px gray;" src="https://gitee.com/wojiaoyishang/python-schoolmanager-pear/raw/master/images/image9.png" />
 </div>
 
+
 > **由于主项目Pear Admin Flask 的修改，配置部分可能有所变化，现在已经更新**
 
 ## 项目介绍与设计理念
