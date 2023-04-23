@@ -57,6 +57,7 @@ layui.use(['table', 'form', 'jquery', 'layer', 'button', 'toast', 'dropdown'], f
     // 单选框事件
     table.on('radio(data-table)', function(obj){ 
         // 获取学生数据
+        obj.data = table.checkStatus('data-table').data[0]
         var name = obj.data['姓名'];
         var grade = obj.data['届数'];
 

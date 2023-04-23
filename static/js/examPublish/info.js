@@ -186,6 +186,7 @@ layui.use(['table', 'form', 'jquery', 'layer', 'button', 'toast', 'select', 'ele
 
         // 单选框事件
         table.on('radio(data-table)', function(obj){ 
+            obj.data = table.checkStatus('data-table').data[0]
             obj.data['赋分'] = obj.data['赋分'] == 1 ? '是' : '否'
             form.val("student-info-form", obj.data);
         });

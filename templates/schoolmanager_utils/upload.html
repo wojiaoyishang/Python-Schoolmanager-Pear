@@ -134,7 +134,7 @@ layui.use(['upload', 'table', 'jquery', 'toast'], function(){
 
     // 单选框事件
     table.on('radio(file-table)', function(obj) { 
-        file = obj.data;
+        file = table.checkStatus('file-table').data[0];
     });
 
 });

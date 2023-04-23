@@ -141,7 +141,7 @@ layui.use(['table', 'form', 'jquery', 'layer', 'button', 'toast', 'dropdown'], f
 
     // 单选框事件
     table.on('radio(data-table)', function(obj) { 
-        exam = obj.data;
+        exam = table.checkStatus('data-table').data[0];
     });
 
     // 查看考试数据
