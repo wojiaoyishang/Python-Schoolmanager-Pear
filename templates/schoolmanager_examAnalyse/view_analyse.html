@@ -651,37 +651,34 @@ function setTips() {
 }
 
 // 获取 chatGPT_words
-function chatGPT_words(giveMark) {
-    
-    chatGPT_controller.abort();
-    chatGPT_controller = new AbortController();
-
-    document.getElementById("chatGPT_words").innerHTML = ""
-    async function readStream(stream) {
-        const reader = stream.getReader();
-        const decoder = new TextDecoder();
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-              break;
-            }
-            let string = decoder.decode(value);
-            document.getElementById("chatGPT_words").innerHTML += string;
-          }
-        } finally {
-          reader.releaseLock();
+async function readStream(stream) {
+    const reader = stream.getReader();
+    const decoder = new TextDecoder();
+    let chunkCount = 0;
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+            break;
+        }
+        let string = decoder.decode(value);
+        document.getElementById("chatGPT_words").innerHTML += string;
+        chunkCount++;
+        // 可以在每个数据块处理之后让渲染引擎有机会处理其他任务
+        if (chunkCount % 100 === 0) {
+            await new Promise(resolve => setTimeout(resolve, 0));
         }
     }
-    
+    reader.releaseLock();
+}
+
+async function chatGPT_words(giveMark) {
+    chatGPT_controller.abort();
+    chatGPT_controller = new AbortController();
+    document.getElementById("chatGPT_words").innerHTML = "正在等待回信......";
     const chatGPT_signal = chatGPT_controller.signal;
-
-    fetch(`/schoolmanager/examAnalyse/view/chatGPTWords_stream?name=${student_name}&grade=${student_grade}&giveMark=${giveMark}`, { signal: chatGPT_signal })
-    .then(response => {
-        const stream = response.body;
-        readStream(stream, chatGPT_signal);
-    });
-
+    const response = await fetch(`/schoolmanager/examAnalyse/view/chatGPTWords_stream?name=${student_name}&grade=${student_grade}&giveMark=${giveMark}`, { signal: chatGPT_signal });
+    const stream = response.body;
+    await readStream(stream);
 }
 
 layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 'table', 'laytpl', 'count'], function () {

@@ -294,7 +294,7 @@ def view_chatGPTWords_stream():
     if chatGPT_count == len(all_exam_data):  # 现在的考试数量
         def generate():
             for chunk in chatGPT_words:  
-                time.sleep(0.05)
+                time.sleep(0.01)
                 yield chunk
         return Response(generate(), mimetype='text/event-stream')
 
@@ -310,15 +310,20 @@ def view_chatGPTWords_stream():
         count = _['count']
         if len(exam_data) == 0:
             continue
+        if exam_data[0]['总分'] == 0:
+            ranks.append(-1)
+            totals.append(count)
+            continue
         ranks.append(exam_data[0]['总分排名'])
         totals.append(count)
     
     # 连接 chatGPT
-    prompt = """你是用户的朋友，也是一个成绩分析AI，你需要帮助分析用户的历次排名成绩， 要求：""" + \
-        """使用中文聊天，并且在末尾加上可爱的颜文字，多使用名言或者诗歌来鼓励用户，请不要说诸如“你参加了这次考试”的话，""" + \
-        """排名(ranks)越小越好，同时用户还会提供所有参加考试的人数(totals)，你需要结合并给出建议，一定要结合排名，比如排名进退等等。""" + \
-        """大概300字，请尽可能鼓励用户，每次参加考试人数与用户历次排名一一对应，最好计算百分比来判断用户所处的水平。"""
-    
+    prompt = """You are a friend of the user, as well as a performance analysis AI. You need to help analyze the user's past ranking scores.
+        Requirements: Use Chinese chat and add cute emojis at the end.Encourage the user with famous quotes or poetry, and avoid saying things like "You participated in this exam."
+        The smaller the ranking, the better. The user will also provide the total number of people who took the exam, and you need to provide advice based on both the ranking and the total number.
+        The prompt should be about 300 words, and please encourage the user as much as possible. Each time the user takes the exam, the number of participants and the user's ranking will correspond one-to-one. 
+        It's best to calculate the percentage to determine the user's level. If the value is -1, it means that the user did not participate in the exam."""
+
     api_key = setting.get("考试查询", "openai_key")
     proxy = setting.get("考试查询", "openai_proxy")
     
@@ -328,10 +333,10 @@ def view_chatGPTWords_stream():
     data = {}
     data['model'] = "gpt-3.5-turbo-0301"
     data['stream'] = True
-    data['max_tokens'] = 500
+    data['max_tokens'] = 1000
     data['messages'] = []
     data['messages'].append({"role": "system", "content": prompt})
-    data['messages'].append({"role": "user", "content": "ranks=" + str(ranks) + \
+    data['messages'].append({"role": "user", "content": "#zh-cn ranks=" + str(ranks) + \
                         "totals=" + str(totals)})
 
     data = json.dumps(data)

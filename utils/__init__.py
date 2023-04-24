@@ -26,7 +26,7 @@ def secure_filename(filename: str) -> str:
         return None
     if filename.strip() == "":
         return None
-    filename = filename.replace("\\", "/")
+    filename = filename.replace("\\", "/").replace(" ", "")
     file_name, file_ext = os.path.splitext(filename)
     return file_name.replace("/", "").replace(".", "") + file_ext
 
