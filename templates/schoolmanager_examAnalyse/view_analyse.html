@@ -496,7 +496,7 @@ function drawChart() {
           result += seriesName + ': ' + data;
           if (dataIndex > 0) {
             var prevData = option.series[params[i].seriesIndex].data[dataIndex - 1];
-            if (prevData != null && date != null) {
+            if (prevData != null && data != null) {
                 var diff = data - prevData;
                 if (-diff >= 0) {
                   result += "&nbsp;&nbsp;<a style='color: darkgreen;'>(" + (-diff >= 0 ? '+' : '') + (-diff) + ")</a>";
