@@ -23,6 +23,11 @@
             from, to { color: transparent }
             50% { color: black }
         }
+
+        #photo img {
+            display: none;
+        }
+  
     </style>
 </head>
 
@@ -270,7 +275,9 @@
 </body>
 <script id="personInfoHTML" type="text/html">
     <ul class="list">
-        <div id="photo" style="text-align: center;"><a href="javascript:show_photo();">点击这里显示你的个人照片</a>
+        <div id="photo" style="text-align: center;  display: flex; justify-content: center;align-items: center;">
+            <img src="/schoolmanager/student/photo/view?name=<% student_name %>&grade=<% student_grade %>" width="33%"/>
+            <a href="javascript:show_photo()">点击这里查看你的个人照片</a>
         </div>
         <%# for (let p of ['姓名', '性别', '班级', '选科', '寝室']) { %>
         <li class="list-item">
@@ -325,7 +332,8 @@ function more_identity_info() {
 
 // 显示个人照片 =w=
 function show_photo() {
-    document.querySelector("#photo").innerHTML = '<img src="/schoolmanager/student/photo/view?name=' + student_name + '&grade=' + student_grade + '" width="33%"/>'
+    document.querySelector("#photo img").style.display = "block";
+    document.querySelector("#photo a").remove();
 }
 
 // 获取个人信息
@@ -488,7 +496,7 @@ function drawChart() {
           result += seriesName + ': ' + data;
           if (dataIndex > 0) {
             var prevData = option.series[params[i].seriesIndex].data[dataIndex - 1];
-            if (prevData != null) {
+            if (prevData != null && date != null) {
                 var diff = data - prevData;
                 if (-diff >= 0) {
                   result += "&nbsp;&nbsp;<a style='color: darkgreen;'>(" + (-diff >= 0 ? '+' : '') + (-diff) + ")</a>";
@@ -674,7 +682,7 @@ async function readStream(stream) {
 async function chatGPT_words(giveMark) {
     chatGPT_controller.abort();
     chatGPT_controller = new AbortController();
-    document.getElementById("chatGPT_words").innerHTML = "正在等待回信......";
+    document.getElementById("chatGPT_words").innerHTML = "";
     const chatGPT_signal = chatGPT_controller.signal;
     const response = await fetch(`/schoolmanager/examAnalyse/view/chatGPTWords_stream?name=${student_name}&grade=${student_grade}&giveMark=${giveMark}`, { signal: chatGPT_signal });
     const stream = response.body;
@@ -723,12 +731,12 @@ layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 
             }
         })
        
-        return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        return false; // 阻止表单跳转。如果需要表单跳转，去掉这段即可。
 
     });
-
-
 })
+
+
 </script>
 </body>
 

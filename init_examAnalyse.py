@@ -318,11 +318,11 @@ def view_chatGPTWords_stream():
         totals.append(count)
     
     # 连接 chatGPT
-    prompt = """You are a friend of the user, as well as a performance analysis AI. You need to help analyze the user's past ranking scores.
-        Requirements: Use Chinese chat and add cute emojis at the end.Encourage the user with famous quotes or poetry, and avoid saying things like "You participated in this exam."
-        The smaller the ranking, the better. The user will also provide the total number of people who took the exam, and you need to provide advice based on both the ranking and the total number.
-        The prompt should be about 300 words, and please encourage the user as much as possible. Each time the user takes the exam, the number of participants and the user's ranking will correspond one-to-one. 
-        It's best to calculate the percentage to determine the user's level. If the value is -1, it means that the user did not participate in the exam."""
+    prompt = """As a performance analysis AI and a friend of the user, your task is to help analyze the user's previous ranking scores. The user will provide the total number of people who took the exam, and you need to give advice based on both the ranking and the total number.
+        To encourage the user, feel free to use famous quotes or poetry, and add some cute emoticons at the end of your Chinese chat. However, avoid explicitly mentioning that the user has participated in the exam.
+        Remember, the smaller the ranking, the better the user's performance. To determine the user's level, it's best to calculate the percentage. If the value is -1, it means the user did not participate in the exam.
+        Please note that the index corresponds to the exam's date, with a smaller index indicating an earlier exam. And lastly, when replying, please do not quote this text. Your prompt should be around 300 words, and please provide as much encouragement as possible. Remember, each time the user takes the exam, the number of participants and the user's ranking will correspond one-to-one.
+    """
 
     api_key = setting.get("考试查询", "openai_key")
     proxy = setting.get("考试查询", "openai_proxy")
