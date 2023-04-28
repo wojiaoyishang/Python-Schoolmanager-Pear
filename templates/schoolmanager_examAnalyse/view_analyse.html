@@ -274,11 +274,11 @@
 
 </body>
 <script id="personInfoHTML" type="text/html">
+    <div id="photo" style="text-align: center;  display: flex; justify-content: center;align-items: center;">
+        <img src="/schoolmanager/student/photo/view?name=<% student_name %>&grade=<% student_grade %>" width="33%"/>
+        <a href="javascript:show_photo()">点击这里查看你的个人照片</a>
+    </div>
     <ul class="list">
-        <div id="photo" style="text-align: center;  display: flex; justify-content: center;align-items: center;">
-            <img src="/schoolmanager/student/photo/view?name=<% student_name %>&grade=<% student_grade %>" width="33%"/>
-            <a href="javascript:show_photo()">点击这里查看你的个人照片</a>
-        </div>
         <%# for (let p of ['姓名', '性别', '班级', '选科', '寝室']) { %>
         <li class="list-item">
             <span class="title"><% p %></span>

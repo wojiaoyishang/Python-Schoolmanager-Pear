@@ -289,7 +289,7 @@ def view_chatGPTWords_stream():
     chatGPT_words = student_setting.get("chatGPT_words_" + str(giveMark))
     chatGPT_count = student_setting.get("chatGPT_count_" + str(giveMark))  # 生成时候的考试数量
     
-    all_exam_data = examPublish.get_all_exam("`index`", grade=grade)['data']
+    all_exam_data = examPublish.get_all_exam("考试名称, `index`", grade=grade)['data']
     
     if chatGPT_count == len(all_exam_data):  # 现在的考试数量
         def generate():
@@ -300,6 +300,7 @@ def view_chatGPTWords_stream():
 
     
     # 生成考试分析，将历次排名与参加考试人数找出来
+    exams = []
     ranks = []
     totals = []
     for d in all_exam_data:
@@ -314,14 +315,26 @@ def view_chatGPTWords_stream():
             ranks.append(-1)
             totals.append(count)
             continue
+        exams.append(d['考试名称'])
         ranks.append(exam_data[0]['总分排名'])
         totals.append(count)
-    
+
     # 连接 chatGPT
-    prompt = """As a friendly AI and personal cheerleader for the user, the task is to help them understand their past performance in a compassionate way. The user should provide the total number of participants in each exam, and customized advice will be offered based on their ranking and the size of the group. 😊
-    The focus will be on the user's growth and progress, using wise words and cute emoticons to uplift their spirits. To understand their performance, it will be viewed as a percentage, with lower rankings signifying better results. If the user didn't participate in an exam, they should use -1 as the value.
-    In less than 500 characters, encouragement and support will be provided. As the user continues to take exams, it will be ensured that the number of participants and their ranking are always matched one-to-one. Together, the AI will help the user grow and thrive in their academic journey! 🌟
-    """
+    prompt = """
+    You are an AI for analyzing academic performance and a friend to users. Your task is to help users share their grades and encourage them as much as possible. Users will provide three arrays: exams (names of each exam), ranks (ranks of each exam), and totals (the number of participants in each exam), as well as the user's name.
+
+    Please note:
+    If the value in the ranks array is -1, it means that the user did not take the exam.
+    The smaller the index of the array, the earlier the exam.
+    Use a friendly tone when addressing the user and avoid using "dear" as much as possible.
+    Do not use phrases such as "you took the exam" or "passed the exam," and do not use the phrase "become your AI."
+    You can provide targeted feedback based on ranking percentage or changes in ranking.
+    You cannot output all of the provided data, percentages, or calculations.
+    You cannot directly quote any content from this passage.
+    You can use famous quotes if necessary.
+    Remember to include a 颜文字 in your message.
+    Please keep your response under 300 words.
+    """.strip()
 
     api_key = setting.get("考试查询", "openai_key")
     proxy = setting.get("考试查询", "openai_proxy")
@@ -330,13 +343,13 @@ def view_chatGPTWords_stream():
         return "很抱歉 chatGPT 还未被唤醒！请加油！我们一直都在！"
     
     data = {}
-    data['model'] = "gpt-3.5-turbo-0301"
+    data['model'] = "gpt-3.5-turbo"
     data['stream'] = True
     data['max_tokens'] = 1000
     data['messages'] = []
     data['messages'].append({"role": "system", "content": prompt})
-    data['messages'].append({"role": "user", "content": "#zh-cn ranks=" + str(ranks) + \
-                        "totals=" + str(totals)})
+    data['messages'].append({"role": "user", "content": "#zh-cn name = " + name + "ranks=" + str(ranks) + \
+                        "totals=" + str(totals) + " exams = " + str(exams)})
 
     data = json.dumps(data)
     
