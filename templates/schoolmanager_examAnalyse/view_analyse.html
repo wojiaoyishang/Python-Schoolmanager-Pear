@@ -707,6 +707,10 @@ layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 
    
    // 绑定事件
    form.on('checkbox(giveMark)', function(data){
+        laytpl.config({
+            open: '{{ "{{" }}',
+            close: '{{ "}}" }}'
+        });
         getExams(data.elem.checked)
    });
 
