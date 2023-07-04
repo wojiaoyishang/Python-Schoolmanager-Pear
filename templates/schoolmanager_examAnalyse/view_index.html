@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    {% include 'admin/common/header.html' %}
+    {% include 'system/common/header.html' %}
     <title>{{ settings['标题'] }}</title>
     <!-- 样 式 文 件 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='admin/component/pear/css/pear.css') }}"/>
@@ -124,7 +124,7 @@
     </form>
 </div>
 
-{% include 'admin/common/footer.html' %}
+{% include 'system/common/footer.html' %}
 <script>
     layui.use(['form', 'jquery', 'layer', 'button', 'popup'], function () {
         let form = layui.form;

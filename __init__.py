@@ -145,12 +145,13 @@ def event_init(app: Flask):
     """初始化完成时会调用这里"""
     # 检测数据文件夹是否存在
     create_database()
+    
     # 绑定到 admin.index 页面（后台管理页面）
-    origin_function = app.view_functions['admin.index']  # 获取原视图函数
+    origin_function = app.view_functions['index.index']  # 获取原视图函数
     def new_function():
         register_power()  # 在获取后台页面之前，看看菜单是否被注册。
         return origin_function()
-    app.view_functions['admin.index'] = new_function  # 拦截原识图函数
+    app.view_functions['index.index'] = new_function  # 拦截原视图函数
 
     # 注册主要视图函数
     schoolmanager_blueprint = Blueprint('schoolmanager', __name__, template_folder='templates', static_folder="static",
