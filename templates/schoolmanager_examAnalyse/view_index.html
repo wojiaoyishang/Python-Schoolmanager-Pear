@@ -5,7 +5,7 @@
     {% include 'system/common/header.html' %}
     <title>{{ settings['标题'] }}</title>
     <!-- 样 式 文 件 -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='admin/component/pear/css/pear.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='system/component/pear/css/pear.css') }}"/>
 
 	<style>
 	.layui-form {
@@ -114,7 +114,7 @@
         </div>
         <div class="layui-form-item">
             <input placeholder="输入验证码" name="captcha" hover class="code layui-input layui-input-inline" lay-verify="required"/>
-            <img src="{{ url_for('passport.get_captcha') }}" class="codeImage" id="captchaImage"/>
+            <img src="{{ url_for('system.passport.get_captcha') }}" class="codeImage" id="captchaImage"/>
         </div>
         <div class="layui-form-item">
             <button class="pear-btn pear-btn-success login" lay-submit lay-filter="check">
@@ -132,7 +132,7 @@
         let layer = layui.layer;
         let button = layui.button;
         let popup = layui.popup;
-        let captchaPath = "{{ url_for('passport.get_captcha') }}";
+        let captchaPath = "{{ url_for('system.passport.get_captcha') }}";
 
         {% if settings['公告'] not in (None, '') %}
         layer.open({
