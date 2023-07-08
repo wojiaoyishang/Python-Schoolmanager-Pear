@@ -33,11 +33,14 @@
                         </select>
                     </div>
                 
-
-                
                     <label class="layui-form-label">表头行</label>
                     <div class="layui-input-inline" style="width:80px">
                         <input type="number" name="header" autocomplete="off" class="layui-input" value={{ args['header'] }}>
+                    </div>
+                    
+                    <label class="layui-form-label">筛选设置</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="sift" autocomplete="off" class="layui-input" value="{{ args['sift'] }}">
                     </div>
                     
                     <div class="layui-input-inline">
@@ -48,6 +51,10 @@
                     </div>
                 </div>
             </form>
+            {% if error %}
+            <span style="color: #FF0000">筛选失败！代码在筛选时出现错误：{{ error }}。</span><br>
+            {% endif %}
+            筛选设置参见 DataFrame 的筛选方式，你可以使用 DataFrame 对象 df ，比如你可以筛选学校 df.学校名称 == "目标学校"，同时你可以使用 math 库中的函数。留空不进行数据筛选。<br>
             此 Excel 中有 {{ sheets|length }} 张表。{{ sheetname }} 表中一共有 {{ length }} 数据，其中前 10 条数据如下：
         </div>
     </div>
@@ -81,6 +88,7 @@
             {# 导入表头表单 #}
             请选择对应导入的表头：
             <form class="layui-form" action="javascript: function(){return 0}" id="imp" lay-filter="imp">
+                
                 {% for impColumn in impColumns %}
                     <div class="layui-input-inline">
                         表头 {{ impColumn }} 导入

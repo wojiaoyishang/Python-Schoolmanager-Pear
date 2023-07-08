@@ -1,4 +1,5 @@
 import os
+import traceback 
 
 import pandas as pd
 
@@ -29,6 +30,7 @@ class imp():
         filename = args.get("filename")  # 文件名
         sheetname = args.get("sheetname", 0)  # sheet名
         header = args.get("header", "0")  # 作为表头的行
+        sift = args.get("sift", "")  # 筛选设置
         impColumns = args.get("impColumns", "").split(",")  # 新表头
         
         
@@ -60,9 +62,17 @@ class imp():
         # 如果没有指定 sheet 那么选择一个 sheet
         if sheetname is None:
             sheetname = sheets[0]
-            
+        
         # 重新取出数据
         df = pd.read_excel(filepath, sheet_name=sheetname, header=header)
+        error = None
+        if sift.strip() != "":
+            try:
+                df = eval("df[" + sift + "]", {'__builtins__':{"df": df, "math": __import__("math")}}, {})
+            except BaseException as e:
+                error = str(e)
+                traceback.print_exc()
+
         
         # 取出表头与前五行数据
         columns = list(df.columns)
@@ -76,7 +86,8 @@ class imp():
                             data=data,
                             length=length,
                             impColumns=impColumns,
-                            args=args)
+                            args=args,
+                            error=error)
     
     
     def get_dataframe(self, args: dict, imp: dict):
@@ -91,6 +102,7 @@ class imp():
         filename = args.get("filename")  # 文件名
         sheetname = args.get("sheetname", 0)  # sheet名
         header = args.get("header", "0")  # 作为表头的行
+        sift = args.get("sift", "")  # 筛选设置
 
         # 判断是否有效
         if filename is None:
@@ -105,9 +117,17 @@ class imp():
         else:
             header = 0
 
-        # 取出数据
-        df = pd.read_excel(filepath, sheet_name=sheetname, header=header, usecols=[_ for _ in imp.values() if _ != ""])
-        
+        # 读取数据
+        df = pd.read_excel(filepath, sheet_name=sheetname, header=header)
+
+        if sift.strip() != "":
+            # 筛选数据
+            df = eval("df[" + sift + "]", {'__builtins__':{"df": df, "math": __import__("math")}}, {})
+            
+        # 选择有意义的列
+        imp_cols = [_ for _ in imp.values() if _ != ""]
+        df = df[imp_cols]
+
         # 对应表头（更改表头）
         for f in imp.keys():
             if imp[f].strip() != "":

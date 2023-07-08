@@ -34,8 +34,7 @@ layui.use(['table', 'form', 'jquery', 'layer', 'button', 'toast', 'dropdown'], f
                     title: '从 Excel 中导入',
                     shade: 0.1,
                     area: ['100%', '100%'],
-                    content:  "/schoolmanager/examPublish/imp?engine=excel",
-                    btn: ['确定']
+                    content:  "/schoolmanager/examPublish/imp?engine=excel"
                 })
             }
         }

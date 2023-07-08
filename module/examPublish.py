@@ -353,8 +353,18 @@ def get_exam(index, limit=50, page=1, giveMark=True, name=None, class_=None, asc
     cur = examData_con.cursor()
     
     # 找到存储的考试表
-    cur.execute(f""" SELECT 考试名称, 届数 FROM "考试数据表" WHERE "index" = ? """, (index,))
-    exam_name, grade = cur.fetchone()
+    cur.execute(f""" SELECT * FROM "考试数据表" WHERE "index" = ? """, (index,))
+    
+    # 获取数据字段
+    table_head = []
+    for d in cur.description:
+        table_head.append(d[0])
+    
+    # 获取数据并对应字段
+    exam_info = dict(zip(table_head, cur.fetchone()))
+    
+    exam_name = exam_info["考试名称"]
+    grade = exam_info["届数"]
     
     if class_ is not None:
         cur.execute(f""" ATTACH DATABASE '{dir_path + "/data/studentData.db"}' AS studentData  """)
@@ -378,6 +388,12 @@ def get_exam(index, limit=50, page=1, giveMark=True, name=None, class_=None, asc
     for d in cur.fetchall():
         data.append(dict(zip(table_head, d)))
     
+    if len(data) != 0:
+        for k in list(data[0].keys()):
+            if k not in ("index", "姓名", "备注", "赋分") and k.find("排名") == -1:
+                cur.execute(f""" SELECT count(*) FROM "{grade}届_{exam_name}" WHERE `{k}` != 0 AND 赋分 = ? """, (int(giveMark),))
+                data[0][k + "人数"] = cur.fetchone()[0]
+    
     # 查询总数
     cur.execute(f""" SELECT count(*) FROM "{grade}届_{exam_name}" WHERE 赋分 = ? {sql_form} """, (int(giveMark),))
     
@@ -385,6 +401,14 @@ def get_exam(index, limit=50, page=1, giveMark=True, name=None, class_=None, asc
     
     cur.close()
     examData_con.close()
+    
+    # 移除没用数据
+    del exam_info['index']
+    del exam_info['届数']
+    del exam_info['考试名称']
+    
+    # 数据合并
+    data[0].update(exam_info)
     
     return {'data': data, 'count': total, 'limit': limit}
 

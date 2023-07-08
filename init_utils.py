@@ -2,6 +2,7 @@
 此文件集成了对于常用功能的支持，比如文件上传
 """
 import os
+import traceback 
 
 from applications.common.utils.http import table_api, success_api, fail_api
 from applications.common.utils.rights import authorize
@@ -103,6 +104,7 @@ def imp_view():
     try:
         return imp_render_view(req)
     except BaseException as e:
+        traceback.print_exc()
         return f"""<script>var error="出现错误！可能是文件不支持或者损坏！{str(e)}"</script>"""
         
     

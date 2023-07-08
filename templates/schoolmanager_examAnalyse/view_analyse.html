@@ -255,16 +255,43 @@
                     <div class="layui-card-header layui-form">成绩报表与成绩走图
                         &nbsp;&nbsp;<input id="giveMark" lay-filter="giveMark" type="checkbox" name="giveMark" title="赋分成绩" lay-skin="primary" checked="">
                     </div>
+                    
                     <div class="layui-card-body" style="line-height:40px;">
-                        
-                        <table class="layui-table" id="data-table" lay-filter="data-table">
-                        </table>
-                        <div class="layui-tab custom-tab layui-tab-brief" lay-filter="docDemoTabBrief">
-                            <div id="echarts-records" style="background-color:#ffffff;min-height:550px;padding: 10px">
+
+                        <div class="layui-row">
+                            <div class="layui-col-md12">
+                                <table class="layui-table" id="data-table" lay-filter="data-table">
+                                </table>
                             </div>
                         </div>
-                        小提示：点击上方的图例可以显示或隐藏指定的排名，你可以拖动折线图下面的滚动来调整折线范围。
+
+                        <div class="layui-row">
+                            <div class="layui-col-md12" id="detail-exam-info">
+                            </div>
+                        </div>
+
+                        <div class="layui-row">
+                            <div class="layui-col-md6">
+                                <div id="echarts-proportion" style="background-color:#ffffff;min-height:550px;padding: 10px">
+                                </div>
+                            </div>
+                            <div class="layui-col-md6">
+                                <div id="echarts-position" style="background-color:#ffffff;min-height:550px;padding: 10px">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-row">
+                            <div class="layui-col-md12">
+                                <div class="layui-tab custom-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+                                    <div id="echarts-records" style="background-color:#ffffff;min-height:550px;padding: 10px">
+                                    </div>
+                                </div>
+                                小提示：点击上方的图例可以显示或隐藏指定的排名，你可以拖动折线图下面的滚动来调整折线范围。
+                            </div>
+                        </div>
                     </div>
+                  
                 </div>
             </div>
         </div>
@@ -273,6 +300,7 @@
     </div>
 
 </body>
+
 <script id="personInfoHTML" type="text/html">
     <div id="photo" style="text-align: center;  display: flex; justify-content: center;align-items: center;">
         <img src="/schoolmanager/student/photo/view?name=<% student_name %>&grade=<% student_grade %>" width="33%"/>
@@ -290,6 +318,29 @@
             <span class="footer"><a href="javascript:more_identity_info();">点击查看</a></span>
         </li>
     </ul>
+</script>
+
+<script id="detailExamInfo" type="text/html">
+    <table class="layui-table">
+        <tr>
+          <th>考试名称</th>
+          <th>考试时间</th>
+          <th>考试备注</th>
+          <th>特控线分数</th>
+          <th>参考人数</th>
+        </tr>
+        <tr>
+          <td><% d.data["考试名称"] %></td>
+          <td><% d.time %></td>
+          <%# if (d.data["考试备注"] == "") { %>
+            <td>无</td>
+          <%# } else { %>
+          <td><% d.data["考试备注"] %></td>
+          <%# } %>
+          <td><% d.data["特控线分数"] %></td>
+          <td><% d.data["总分人数"] %></td>
+        </tr>
+      </table>      
 </script>
 
 
@@ -571,12 +622,23 @@ function getExams(giveMark) {
             student_exam = res['data']
         },
         done: function (res, curr, count) {
-            // 选中第一行
-            layui.$(".layui-table-view[lay-id='data-table'] .layui-table-body tr[data-index=0] .layui-form-radio").click();
+
+            layui.$(".layui-table-view[lay-id='data-table'] .layui-table-body tr[data-index=" + (res.data.length - 1) + "] .layui-form-radio").click();
+            analyseExamProportion(res.data.length - 1)
+            analyseExamRank(res.data.length - 1)
+            showDetailExamInfo(res.data.length - 1)
             drawChart();
             setTips();
             chatGPT_words(giveMark ? "1" : "0");
         }
+    })
+
+    //监听行单击事件（双击事件为：rowDouble）
+    layui.table.on('radio(data-table)', function(obj) { 
+        // 分析成绩占比
+        analyseExamProportion(obj.index)
+        analyseExamRank(obj.index)
+        showDetailExamInfo(obj.index)
     })
 
    
@@ -613,6 +675,7 @@ function setTips() {
         '地': '地理',
         '生': '生物'
     };
+
     let subjects = student_info['选科'].split('').map(subject => subjectMap[subject]);
     let mainSubjects = ["语文", "数学", "外语"];
     let minorSubjects = subjects.filter(subject => !["语文", "数学", "外语"].includes(subject));;
@@ -689,6 +752,225 @@ async function chatGPT_words(giveMark) {
     await readStream(stream);
 }
 
+// 成绩占比分析
+function analyseExamProportion(i) {
+    let subjectMap = {
+            '语': '语文',
+            '数': '数学',
+            '外': '外语',
+            '物': '物理',
+            '化': '化学',
+            '技': '技术',
+            '政': '政治',
+            '史': '历史',
+            '地': '地理',
+            '生': '生物'
+        };
+        
+    let subjects = student_info['选科'].split('').map(subject => subjectMap[subject]);
+    let mainSubjects = ["语文", "数学", "外语"];
+    let minorSubjects = subjects.filter(subject => !["语文", "数学", "外语"].includes(subject));;
+    let allSubjects = [...mainSubjects, ...minorSubjects];
+
+    let convertMark = {};
+    let convertMark_total = 0;
+
+    for (subject of allSubjects) {
+        convertMark[subject] = student_exam[i][subject] / student_exam[i][subject + "总分"]
+        convertMark_total += convertMark[subject]
+    }
+
+    // 创建一个数组来保存各科分数占比
+    let subjectPercentages = [];
+
+    // 计算各科分数占比并将结果保存到数组中
+    for (subject of allSubjects) {
+        let percentage = convertMark[subject] / convertMark_total * 100;
+        subjectPercentages.push({
+            name: subject,
+            value: percentage.toFixed(2) // 保留两位小数
+        });
+    }
+
+
+     // 导入echarts库，并使用保存的数据绘制饼状图
+    chart = echarts.init(document.getElementById('echarts-proportion'));
+    chart.setOption({
+    title: {
+        text: '各科分数占比',
+        x: 'center'
+    },
+    tooltip: {
+        trigger: 'item',
+        formatter: function(params) {
+            return `${params.seriesName}<br/><span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${params.color};"></span>${params.name} : ${params.value}%`;
+        }
+    },
+    series: [
+        {
+            name: '分数占比',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '45%'],
+            data: subjectPercentages,
+            label: { // 标签设置
+                show: true,
+                formatter: '{b}: {d}%', // 显示标签和百分比
+            },
+            emphasis: {
+                label: {
+                show: true,
+                fontSize: '16',
+                fontWeight: 'bold'
+                },
+                itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            }
+        }
+    ],
+    graphic: [
+    {
+      type: 'text',
+      left: 'center',
+      bottom: '10%',
+      style: {
+        text: '考试分数占比计算时会把每一科成绩除以该科目总分进行折算，并计算该科目在所有折算总分中的占比。',
+        fill: '#333',
+        fontSize: 14
+      }
+    }
+  ]
+    });
+
+    // 监听窗口拖动事件，重新绘制图表
+    window.addEventListener('resize', () => {
+        chart.resize();
+    });
+
+
+}
+
+
+// 成绩排名显示
+function analyseExamRank(i) {
+    let subjectMap = {
+        '语': '语文',
+        '数': '数学',
+        '外': '外语',
+        '物': '物理',
+        '化': '化学',
+        '技': '技术',
+        '政': '政治',
+        '史': '历史',
+        '地': '地理',
+        '生': '生物'
+    };
+    
+    let subjects = student_info['选科'].split('').map(subject => subjectMap[subject]);
+    let mainSubjects = ["语文", "数学", "外语"];
+    let minorSubjects = subjects.filter(subject => !["语文", "数学", "外语"].includes(subject));
+    let allSubjects = [...mainSubjects, ...minorSubjects, "主科", "副科", "总分"];
+    
+    let chartData = allSubjects.map(subject => {
+
+        let total = student_exam[i][subject + "排名"] + student_exam[i][subject + "人数"];
+
+        let rank = student_exam[i][subject + "排名"] / total;
+        let numDiff = student_exam[i][subject + "人数"] / total;
+
+        return {
+            subject: subject,
+            rank: rank,
+            numDiff: numDiff
+        };
+    });
+
+    let chart = echarts.init(document.getElementById('echarts-position'));
+    chart.setOption({
+        title: {
+            text: '排名位置',
+            x: 'center'
+        },
+        xAxis: {
+            type: 'category',
+            data: chartData.map(data => data.subject)
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: function(value) {
+                    return value + '%';
+                }
+            }
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                return `<span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${params.color};"></span>${params.seriesName}<br/>${params.name} : ${params.value}%`;
+            }
+        },     
+        series: [
+            {
+                name: '你的排名在总人数中的占比',
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: '{c}%'
+                },
+                data: chartData.map(data => (data.numDiff / (data.rank + data.numDiff) * 100).toFixed(1))
+            },
+            {
+                name: '未超过人数在总人数中的占比',
+
+                type: 'bar',
+                stack: '总量',
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: '{c}%'
+                },
+                data: chartData.map(data => (data.rank / (data.rank + data.numDiff) * 100).toFixed(1))
+            }
+            
+        ]
+    });
+    
+
+    window.addEventListener('resize', () => {
+        chart.resize();
+    });
+}
+
+function showDetailExamInfo(i) {
+    layui.laytpl.config({
+        open: '<%',
+        close: '%>'
+    });
+
+    // 时间戳转化为时间
+    const ts = student_exam[i]["考试时间"];
+
+    // 创建一个日期对象
+    const date = new Date(ts);
+
+    // 获取年月日小时分钟秒数
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，需要加1，并使用padStart函数补齐两位数
+    const day = date.getDate().toString().padStart(2, '0');
+
+    // 拼接成字符串
+    const dateString = `${year}年${month}月${day}日`;
+    
+    layui.laytpl(detailExamInfo.innerHTML).render({data: student_exam[i], time: dateString}, function(string){
+        document.querySelector("#detail-exam-info").innerHTML = string
+    });
+}
+
 layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 'table', 'laytpl', 'count'], function () {
     var $ = layui.jquery,
         echarts = layui.echarts,
@@ -736,8 +1018,9 @@ layui.use(['layer', 'echarts', 'element', 'loading', 'form', 'button', 'toast', 
         })
        
         return false; // 阻止表单跳转。如果需要表单跳转，去掉这段即可。
-
     });
+
+
 })
 
 
