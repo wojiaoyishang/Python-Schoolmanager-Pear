@@ -879,7 +879,7 @@ function analyseExamRank(i) {
         let total = student_exam[i][subject + "排名"] + student_exam[i][subject + "人数"];
 
         let rank = student_exam[i][subject + "排名"] / total;
-        let numDiff = student_exam[i][subject + "人数"] / total;
+        let numDiff = (student_exam[i][subject + "人数"] - student_exam[i][subject + "排名"]) / total;
 
         return {
             subject: subject,
@@ -914,7 +914,7 @@ function analyseExamRank(i) {
         },     
         series: [
             {
-                name: '你的排名在总人数中的占比',
+                name: '超过占比',
                 type: 'bar',
                 stack: '总量',
                 label: {
@@ -925,7 +925,7 @@ function analyseExamRank(i) {
                 data: chartData.map(data => (data.numDiff / (data.rank + data.numDiff) * 100).toFixed(1))
             },
             {
-                name: '未超过人数在总人数中的占比',
+                name: '未超过占比',
 
                 type: 'bar',
                 stack: '总量',
