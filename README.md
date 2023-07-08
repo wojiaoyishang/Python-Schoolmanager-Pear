@@ -351,3 +351,4 @@ if __name__ == '__main__':
 地址为： http(s)://你的域名（或者是IP地址）/schoolmanager
 
 
+![输入图片说明](images/image6.jpg.png)
