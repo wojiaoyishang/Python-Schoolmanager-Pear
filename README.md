@@ -141,6 +141,8 @@ pip install -r requirement\dev.txt
 
 # 安装 此项目依赖
 pip install pandas
+pip install requests
+pip install openpyxl
 ```
 
 或者您可以尝试：
@@ -152,6 +154,7 @@ python -m pip install -r requirement\requirement.txt
 # 安装 此项目依赖
 python -m pip install pandas
 python -m pip install requests
+pip install openpyxl
 ```
 
 ### 导入 Pear Admin Flask 初始化数据库
