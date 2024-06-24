@@ -38,7 +38,7 @@
 
 **采用 Python 版本：** ```3.8.6```  _在开发项目时，推荐使用 >= 3.8.6 的 Python 运行此项目_ 
 
-**采用 IDE：** ```Visual Studio Code```  _推荐使用 Visual Studio Code、PyCharm 等IDE开发_ 
+**采用 IDE：** ```Visual Studio Code```  _推荐使用 Visual Studio Code、PyCharm 等 IDE 开发_ 
 
 ## 快速预览
 
