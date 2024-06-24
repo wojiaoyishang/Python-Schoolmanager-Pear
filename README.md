@@ -28,7 +28,7 @@
 
 我的设计理念是：简单而不简陋，灵活而不混乱。我希望通过我的插件，能够帮助学校实现高效、便捷、智能的数据管理。
 
-项目演示：[Python Schoolmanager 学校数据管理-哔哩哔哩](https://b23.tv/kERTlNb)
+项目演示视频：[Python Schoolmanager 学校数据管理-哔哩哔哩](https://b23.tv/kERTlNb)
 
 ## 项目说明 
 
