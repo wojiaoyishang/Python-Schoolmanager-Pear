@@ -34,7 +34,7 @@
 
 项目基于我参与开发的 [Pear Admin Flask](https://gitee.com/pear-admin/pear-admin-flask)，但是并**不修改原项目**，而是以插件的形式接入。当今时代，开源共建为热门话题，越来越多的企业和个人参与到开源项目中，分享自己的代码和经验，共同推动技术创新和社会进步。开源共建不仅能够提高软件质量和安全性，还能够激发创造力和协作精神，形成良好的生态环境，而此项目以插件的形式接入有利于项目的二次开发。
 
-所以在搭建项目前，可以参考 [Pear Admin Flask 配置搭建](https://pear-admin.gitee.io/pear-admin-site/doc/index.html) 的相关内容。
+所以在搭建项目前，可以参考 [Pear Admin Flask 配置搭建](https://pear-admin.gitee.io/pear-admin-site/doc/index.html) 的相关内容 。
 
 **采用 Python 版本：** ```3.8.6```  _在开发项目时，推荐使用 >= 3.8.6 的 Python 运行此项目_ 
 
