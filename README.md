@@ -26,7 +26,7 @@
 
 此项目使用 SQLite3 作为数据库存储数据，并采用 Jinja2 作为模板引擎渲染页面。此外，此项目还支持用户验证和权限控制，保证了数据的安全性。
 
-我的设计理念是：简单而不简陋，灵活而不混乱。我希望通过我的插件，能够帮助学校实现高效、便捷、智能的数据管理。 
+我的设计理念是：简单而不简陋，灵活而不混乱。我希望通过我的插件，能够帮助学校实现高效、便捷、智能的数据管理。
 
 项目演示：[Python Schoolmanager 学校数据管理-哔哩哔哩](https://b23.tv/kERTlNb)
 
@@ -44,10 +44,10 @@
 
 |  |  |
 |---------------------|---------------------|
-|![输入图片说明](images/image1.png)| ![输入图片说明](images/image2.png) |
-|![输入图片说明](images/image3.png)| ![输入图片说明](images/image4.png) |
-|![输入图片说明](images/image5.png)| ![输入图片说明](images/image6.png) |
-|![输入图片说明](images/image7.png)|![输入图片说明](images/image8.png) |
+|![示例1](images/image1.png)| ![示例2](images/image2.png) |
+|![示例3](images/image3.png)| ![示例4](images/image4.png) |
+|![示例5](images/image5.png)| ![示例6](images/image6.png) |
+|![示例7](images/image7.png)|![示例8](images/image8.png) |
 
 
 ## 设计计划
